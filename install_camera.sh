@@ -1,0 +1,144 @@
+#!/bin/bash
+
+tput setaf 2
+echo "Installing camera program"
+tput sgr0
+
+rm -rf /home/pi/camera
+mkdir /home/pi/camera
+
+openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey
+read -p "Provide your Tenant name (or Id): " tenant
+read -p "Provide your Device name (or Id): " device
+openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$tenant/CN=$device'
+
+tput setaf 2
+echo "Add this certificate to your device"
+tput sgr0
+cat /home/pi/camera/device_cert.pem
+
+cat << 'EOF' > /home/pi/camera/camera.py
+#!/usr/bin/python
+
+import ssl
+import paho.mqtt.client as mqtt
+from picamera import PiCamera
+from time import sleep
+from itertools import chain, islice
+import uu
+import os
+import glob
+import hashlib
+import urllib
+
+vidFilename = '/home/pi/camera/video.h264'
+txtFilename = '/home/pi/camera/video.txt'
+
+# Record a 30 seconds video
+with PiCamera() as camera:
+    camera.resolution = (640, 480)
+    camera.framerate = 30
+    camera.start_recording(vidFilename)
+    camera.wait_recording(30)
+    camera.stop_recording()
+
+# Encode the file into text
+uu.encode(vidFilename, txtFilename)
+
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+md5 = md5(vidFilename)
+os.remove(vidFilename)
+
+# Split the file to chunks not larger than 1 Mb
+def chunks(iterable, n):
+   iterable = iter(iterable)
+   while True:
+       yield chain([next(iterable)], islice(iterable, n-1))
+
+l = 5000
+with open(txtFilename) as bigfile:
+    for i, lines in enumerate(chunks(bigfile, l)):
+        file_split = '/home/pi/camera/chunk.{}'.format(i)
+        with open(file_split, 'w') as f:
+            f.writelines(urllib.quote("\n".join(lines)))
+os.remove(txtFilename)
+
+# Iterate on chunks and send a message for each one
+
+url = "mqtt.dev.olt-dev.io"
+ca = "/home/pi/raspberrypi/olt_ca.pem" 
+cert = "/home/pi/camera/device_cert.pem"
+private = "/home/pi/camera/device_key.pem"
+
+file_names = glob.glob("/home/pi/camera/chunk.*")
+for file_name in file_names:
+    with open(file_name, 'r') as file :
+        filedata = file.read()
+        with open(file_name, 'r+') as f:
+            f.seek(0, 0)
+            f.write('{ "type": "configuration", "value": { ' +
+                '"hash": "' + md5 + '", ' +
+                '"chunk": ' + file_name.split('.')[1] + ', ' +
+                '"video": "' + filedata + '"')
+            f.seek(0, os.SEEK_END)
+            f.write(' } }')
+
+    with open(file_name, 'r') as file :
+        filedata = file.read()
+        mqttc = mqtt.Client()
+        ssl_context = ssl.create_default_context()
+        ssl_context.set_alpn_protocols(["mqttv311"])
+        ssl_context.load_verify_locations(cafile=ca)
+        ssl_context.load_cert_chain(certfile=cert, keyfile=private)
+        mqttc.tls_set_context(context=ssl_context)
+        mqttc.connect(url, port=8883)
+        mqttc.publish("data-ingest", filedata)
+        os.remove(file_name)
+
+EOF
+
+chmod +x /home/pi/camera/camera.py
+
+cat << 'EOF' > /home/pi/camera/cron.sh
+#!/bin/bash
+
+kill $(ps aux | grep '[c]amera.py' | awk '{print $2}')
+/usr/bin/python /home/pi/camera/camera.py &
+
+EOF
+
+chmod +x /home/pi/camera/cron.sh
+
+crontab -l > /tmp/crontabentry
+if grep -q "camera/cron.sh" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/camera/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+
+echo """
+Please Make sure your Device type has a structure similar to this one
+
+{
+  "configuration": {
+    "hash": {
+      "type": "string"
+    },
+    "chunk": {
+      "type": "integer"
+    },
+    "video": {
+      "type": "string"
+    }
+  }
+}
+"""
+
+tput setaf 2
+echo "Installation complete"
+tput sgr0
