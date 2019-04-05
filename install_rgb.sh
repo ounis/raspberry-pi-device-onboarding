@@ -2,6 +2,22 @@
 
 tput setaf 2
 echo "Installing rgb program"
+
+echo """
+An RGB-LED, 5mm, bedrahtet, 4-Pin was used to test this script, but other kinds of similar components could be used
+
+GPIO mapping
+
+--------------------------
+| Device  | Raspberry Pi |
+--------------------------
+| Green   | GPIO 24      |
+| Blue    | GPIO 25      |
+| Cathode | GPIO 4       |
+| Red     | GPIO 23      |
+--------------------------
+
+"""
 tput sgr0
 
 rm -rf /home/pi/rgb

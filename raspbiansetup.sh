@@ -1,6 +1,7 @@
 #!/bin/bash
 
 tput setaf 2
+echo "Insttalling a Raspberry Pi"
 echo "Install Mosqitto"
 tput sgr0
 cd /tmp

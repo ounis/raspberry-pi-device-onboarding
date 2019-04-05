@@ -2,6 +2,30 @@
 
 tput setaf 2
 echo "Installing screen program"
+
+echo """
+A 4-digit 7-segment LED, 12 pins was used to test this script, but other kinds of similar components could be used
+
+GPIO mapping
+
+--------------------------
+| Device  | Raspberry Pi |
+--------------------------
+| D1      | GPIO 11      |
+| A       | GPIO 5       |
+| F       | GPIO 6       |
+| D2      | GPIO 13      |
+| D3      | GPIO 19      |
+| B       | GPIO 26      |
+| E       | GPIO 4       |
+| D       | GPIO 17      |
+| Decimal | GPIO 27      |
+| C       | GPIO 22      |
+| G       | GPIO 10      |
+| D4      | GPIO 9       |
+--------------------------
+
+"""
 tput sgr0
 
 rm -rf /home/pi/screen

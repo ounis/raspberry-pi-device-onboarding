@@ -2,6 +2,20 @@
 
 tput setaf 2
 echo "Installing fan program"
+
+echo """
+A 30 x 30 mm Fan 5V 7 mA was used to test this script, but other kinds of fans could be used
+
+GPIO mapping
+
+------------------------------------
+| Device            | Raspberry Pi |
+------------------------------------
+| Red wire (VCC 5V) | VGPIO 14     |
+| Black wire (Gnd)  | Ground       |
+------------------------------------
+
+"""
 tput sgr0
 
 rm -rf /home/pi/fan

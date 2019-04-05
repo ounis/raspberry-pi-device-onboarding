@@ -2,6 +2,12 @@
 
 tput setaf 2
 echo "Installing camera program"
+
+echo """
+A Raspberry Pi V2.1 8MP 1080P Camera was used to test this script, but other kinds of cameras could be used
+Please don't forget to enable the camera in your raspi-config
+
+"""
 tput sgr0
 
 rm -rf /home/pi/camera

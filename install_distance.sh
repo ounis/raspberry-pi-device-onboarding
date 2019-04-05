@@ -2,6 +2,23 @@
 
 tput setaf 2
 echo "Installing distance program"
+
+
+echo """
+A Ultrasonic Sensor HC – SR04 was used to test this script, but other kinds of similar sensors could be used
+
+GPIO mapping
+
+-------------------------
+| Device | Raspberry Pi |
+-------------------------
+| VCC    | VCC 5V       |
+| Trig   | GPIO 14      |
+| Echo   | GPIO 15      |
+| GND    | Ground       |
+-------------------------
+
+"""
 tput sgr0
 
 rm -rf /home/pi/distance

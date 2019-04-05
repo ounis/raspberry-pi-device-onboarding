@@ -2,6 +2,21 @@
 
 tput setaf 2
 echo "Installing presence program"
+
+echo """
+A HC-SR501 PIR Sensor was used to test this script, but other kinds of similar sensors could be used
+
+GPIO mapping
+
+-------------------------
+| Device | Raspberry Pi |
+-------------------------
+| VCC    | VCC 5V       |
+| Out    | GPIO 4       |
+| GND    | Ground       |
+-------------------------
+
+"""
 tput sgr0
 
 rm -rf /home/pi/presence
