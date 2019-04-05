@@ -79,8 +79,12 @@ EOF
 chmod +x /home/pi/presence/cron.sh
 
 crontab -l > /tmp/crontabentry
-if grep -q "presence/cron.sh" /tmp/crontabentry; then
+if ! grep -q "presence/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/presence/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if grep -q "no crontab" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/presence/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

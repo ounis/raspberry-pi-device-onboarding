@@ -222,10 +222,15 @@ EOF
 chmod +x /home/pi/distance/cron.sh
 
 crontab -l > /tmp/crontabentry
-if grep -q "distance/cron.sh" /tmp/crontabentry; then
+if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/distance/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
+if grep -q "no crontab" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/distance/cron.sh' > /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+
 
 echo """
 Please Make sure your Device type has a structure similar to this one

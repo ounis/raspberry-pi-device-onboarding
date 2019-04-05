@@ -35,7 +35,7 @@ openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /
 tput setaf 2
 echo "Your device certificate is:"
 tput sgr0
-cat device_cert.pem
+cat /home/pi/raspberrypi/device_cert.pem
 tput setaf 2
 echo "Please copy and paste it in your device certificate section in OLT platform"
 
@@ -82,11 +82,15 @@ msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s" } }' "$ip"
 
 EOF
 
-chmod +x ipmqtt.sh
+chmod +x /home/pi/raspberrypi/ipmqtt.sh
 
 crontab -l > /tmp/crontabentry
-if grep -q "raspberrypi/cron.sh" /tmp/crontabentry; then
+if ! grep -q "raspberrypi/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/raspberrypi/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if grep -q "no crontab" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/raspberrypi/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

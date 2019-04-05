@@ -66,8 +66,12 @@ EOF
 chmod +x /home/pi/link/cron.sh
 
 crontab -l > /tmp/crontabentry
-if grep -q "link/cron.sh" /tmp/crontabentry; then
+if ! grep -q "link/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if grep -q "no crontab" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/link/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
