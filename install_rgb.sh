@@ -4,16 +4,16 @@ tput setaf 2
 echo "Installing rgb program"
 
 echo """
-An RGB-LED, 5mm, bedrahtet, 4-Pin was used to test this script, but other kinds of similar components could be used
+Connect a 4-pin RGB-LED to your Raspberry Pi.
 
-GPIO mapping
-#Map Cathode to GPIO 5, since we use 4 in the motion sensor program
+GPIO mapping:
+
 --------------------------
 | Device  | Raspberry Pi |
 --------------------------
 | Green   | GPIO 24      |
 | Blue    | GPIO 25      |
-| Cathode | GPIO 4       | 
+| Cathode | GPIO 5       | 
 | Red     | GPIO 23      |
 --------------------------
 
@@ -124,7 +124,7 @@ fi
 
 echo """
 Please Make sure your Device type has a structure similar to this one
-
+#Escape quotation marks, they are not displayed.
 {
   "actions": {
     "ambientLight": {
