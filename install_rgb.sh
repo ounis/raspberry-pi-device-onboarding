@@ -7,13 +7,13 @@ echo """
 An RGB-LED, 5mm, bedrahtet, 4-Pin was used to test this script, but other kinds of similar components could be used
 
 GPIO mapping
-
+#Map Cathode to GPIO 5, since we use 4 in the motion sensor program
 --------------------------
 | Device  | Raspberry Pi |
 --------------------------
 | Green   | GPIO 24      |
 | Blue    | GPIO 25      |
-| Cathode | GPIO 4       |
+| Cathode | GPIO 4       | 
 | Red     | GPIO 23      |
 --------------------------
 
