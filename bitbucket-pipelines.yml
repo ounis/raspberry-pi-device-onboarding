@@ -2,12 +2,17 @@ image: ryankurte/docker-rpi-emu
 
 definitions:
   steps:
-    - step: &install-rgb
-        name: Install RGB
+    - step: &raspbian-setup
+        name: Raspbian Setup
         script:
-          - bash install_rgb.sh
+          - bash raspbiansetup.sh
+    - step: &install-rgb
+          name: Install RGB
+          script:
+            - bash install_rgb.sh
 
 pipelines:
   default:
     - parallel:
       - step: *install-rgb
+      - step: *raspbian-setup

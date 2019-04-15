@@ -15,6 +15,7 @@ sudo apt-get install -y mosquitto mosquitto-clients
 [[ $- == *i* ]] && tput setaf 2
 echo "Install some other dependencies (Could be skipped)"
 [[ $- == *i* ]] && tput sgr0
+sudo apt-get install -y cron
 sudo apt-get install -y python-smbus
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python-pip
