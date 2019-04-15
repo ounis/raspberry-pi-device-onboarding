@@ -26,10 +26,15 @@ sudo pip install paho-mqtt
 [[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
+echo "Checking if repo exist"
 if [ -d /home/pi/raspberrypi ]; then
+  echo "Repo already there"
   rm -rf /home/pi/raspberrypi
+  echo "Repo deleted"
 fi
-mkdir -p /home/pi/raspberrypi
+echo "Creating the repo"
+mkdir /home/pi/raspberrypi
+echo "Repo created"
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name: " tenant
 read -p "Provide your Device name: " device
