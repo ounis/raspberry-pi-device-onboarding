@@ -1,4 +1,4 @@
-image: raspberry-gpio-emulator
+image: ryankurte/docker-rpi-emu
 
 definitions:
   steps:
