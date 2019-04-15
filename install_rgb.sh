@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installing rgb program"
 
 echo """
