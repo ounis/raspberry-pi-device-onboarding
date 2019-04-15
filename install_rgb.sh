@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+tput -T linux setaf 2
 echo "Installing rgb program"
 
 echo """
@@ -21,7 +21,7 @@ GPIO mapping:
 tput sgr0
 
 rm -rf /home/pi/rgb
-mkdir /home/pi/rgb
+mkdir -p /home/pi/rgb
 
 openssl ecparam -out /home/pi/rgb/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name (or Id): " tenant
