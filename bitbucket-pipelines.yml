@@ -1,0 +1,13 @@
+image: raspberry-gpio-emulator
+
+definitions:
+  steps:
+    - step: &install-rgb
+        name: Install RGB
+        script:
+          - bash install_rgb.sh
+
+pipelines:
+  default:
+    - parallel:
+      - step: *install-rgb
