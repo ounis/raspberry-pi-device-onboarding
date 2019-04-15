@@ -31,7 +31,13 @@ if [ -d /home/pi/raspberrypi ]; then
 fi
 
 mkdir /home/pi/raspberrypi
-find / > /dev/null &
+# Genereate enough entropy inside the container to generate the ssl key
+i=0
+while [ ! -d /home/pi/raspberrypi/device_key.pem ] do
+  find / > /dev/null 2>&1
+  print $i
+  $i++
+done &
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name: " tenant
 read -p "Provide your Device name: " device
