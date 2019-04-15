@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 [[ $- == *i* ]] && tput setaf 2
 echo "Installing presence program"
 
