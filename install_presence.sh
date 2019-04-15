@@ -20,7 +20,9 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-rm -rf /home/pi/presence
+if [ -d /home/pi/presence ]; then
+  rm -rf /home/pi/presence
+fi
 mkdir -p /home/pi/presence
 
 openssl ecparam -out /home/pi/presence/device_key.pem -name prime256v1 -genkey

@@ -11,7 +11,9 @@ Please don't forget to enable the camera in your raspi-config
 """
 [[ $- == *i* ]] && tput sgr0
 
-rm -rf /home/pi/camera
+if [ -d /home/pi/camera ]; then
+  rm -rf /home/pi/camera
+fi
 mkdir -p /home/pi/camera
 
 openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey

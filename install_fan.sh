@@ -19,7 +19,9 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-rm -rf /home/pi/fan
+if [ -d /home/pi/fan ]; then
+  rm -rf /home/pi/fan
+fi
 mkdir -p /home/pi/fan
 
 cat << 'EOF' > /home/pi/fan/fan.py

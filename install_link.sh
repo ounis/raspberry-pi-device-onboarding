@@ -5,7 +5,9 @@ set -e
 echo "Installing link program"
 [[ $- == *i* ]] && tput sgr0
 
-rm -rf /home/pi/link
+if [ -d /home/pi/link ]; then
+  rm -rf /home/pi/link
+fi
 mkdir -p /home/pi/link
 
 read -p "Provide your API Authentication-Token: " token

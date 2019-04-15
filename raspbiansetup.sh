@@ -26,7 +26,9 @@ sudo pip install paho-mqtt
 [[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
-rm -rf /home/pi/raspberrypi
+if [ -d /home/pi/raspberrypi ]; then
+  rm -rf /home/pi/raspberrypi
+fi
 mkdir -p /home/pi/raspberrypi
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name: " tenant

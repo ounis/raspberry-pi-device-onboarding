@@ -21,7 +21,9 @@ GPIO mapping:
 """
 [[ $- == *i* ]] && tput sgr0
 
-rm -rf /home/pi/rgb
+if [ -d /home/pi/rgb ]; then
+  rm -rf /home/pi/rgb
+fi
 mkdir -p /home/pi/rgb
 
 openssl ecparam -out /home/pi/rgb/device_key.pem -name prime256v1 -genkey
