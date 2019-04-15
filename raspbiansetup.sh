@@ -6,6 +6,7 @@ echo "Insttalling a Raspberry Pi"
 echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
+sudo apt-get update -y
 sudo apt install -y wget
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
 sudo apt-key add mosquitto-repo.gpg.key
