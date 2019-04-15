@@ -333,12 +333,12 @@ echo """
 Please Make sure your Device type has a structure similar to this one
 
 {
-  "actions": {
-    "updateNumber": {
-      "type": "object",
-      "properties": {
-        "number": {
-          "type": "string"
+  \"actions\": {
+    \"updateNumber\": {
+      \"type\": \"object\",
+      \"properties\": {
+        \"number\": {
+          \"type\": \"string\"
         }
       }
     }

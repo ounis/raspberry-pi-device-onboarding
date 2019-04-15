@@ -13,7 +13,7 @@ GPIO mapping:
 --------------------------
 | Green   | GPIO 24      |
 | Blue    | GPIO 25      |
-| Cathode | GPIO 5       | 
+| Cathode | GPIO 5       |
 | Red     | GPIO 23      |
 --------------------------
 
@@ -124,20 +124,20 @@ fi
 
 echo """
 Please Make sure your Device type has a structure similar to this one
-#Escape quotation marks, they are not displayed.
+
 {
-  "actions": {
-    "ambientLight": {
-      "type": "object",
-      "properties": {
-        "b": {
-          "type": "string"
+  \"actions\": {
+    \"ambientLight\": {
+      \"type\": \"object\",
+      \"properties\": {
+        \"b\": {
+          \"type\": \"string\"
         },
-        "g": {
-          "type": "string"
+        \"g\": {
+          \"type\": \"string\"
         },
-        "r": {
-          "type": "string"
+        \"r\": {
+          \"type\": \"string\"
         }
       }
     }

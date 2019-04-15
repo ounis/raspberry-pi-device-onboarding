@@ -236,9 +236,9 @@ echo """
 Please Make sure your Device type has a structure similar to this one
 
 {
-  "configuration": {
-    "distance": {
-      "type": "string"
+  \"configuration\": {
+    \"distance\": {
+      \"type\": \"string\"
     }
 }
 

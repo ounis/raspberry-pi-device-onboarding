@@ -135,15 +135,15 @@ echo """
 Please Make sure your Device type has a structure similar to this one
 
 {
-  "configuration": {
-    "hash": {
-      "type": "string"
+  \"configuration\": {
+    \"hash\": {
+      \"type\": \"string\"
     },
-    "chunk": {
-      "type": "integer"
+    \"chunk\": {
+      \"type\": \"integer\"
     },
-    "video": {
-      "type": "string"
+    \"video\": {
+      \"type\": \"string\"
     }
   }
 }

@@ -92,9 +92,9 @@ echo """
 Please Make sure your Device type has a structure similar to this one
 
 {
-  "configuration": {
-    "presence": {
-      "type": "integer"
+  \"configuration\": {
+    \"presence\": {
+      \"type\": \"integer\"
     }
   }
 }
