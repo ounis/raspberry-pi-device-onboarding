@@ -11,7 +11,7 @@ Please don't forget to enable the camera in your raspi-config
 [[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/camera
-mkdir /home/pi/camera
+mkdir -p /home/pi/camera
 
 openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name (or Id): " tenant

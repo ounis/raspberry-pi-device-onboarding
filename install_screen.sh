@@ -29,7 +29,7 @@ GPIO mapping
 [[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/screen
-mkdir /home/pi/screen
+mkdir -p /home/pi/screen
 
 openssl ecparam -out /home/pi/screen/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name (or Id): " tenant

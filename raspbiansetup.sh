@@ -5,6 +5,7 @@ echo "Insttalling a Raspberry Pi"
 echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
+apt-get -y install sudo
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
 sudo apt-key add mosquitto-repo.gpg.key
 cd /etc/apt/sources.list.d/
@@ -27,7 +28,7 @@ sudo pip install paho-mqtt
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
 rm -rf /home/pi/raspberrypi
-mkdir /home/pi/raspberrypi
+mkdir -p /home/pi/raspberrypi
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name: " tenant
 read -p "Provide your Device name: " device

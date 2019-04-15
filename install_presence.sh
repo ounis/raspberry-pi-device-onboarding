@@ -20,7 +20,7 @@ GPIO mapping
 [[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/presence
-mkdir /home/pi/presence
+mkdir -p /home/pi/presence
 
 openssl ecparam -out /home/pi/presence/device_key.pem -name prime256v1 -genkey
 read -p "Provide your Tenant name (or Id): " tenant

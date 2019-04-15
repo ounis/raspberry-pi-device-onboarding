@@ -5,7 +5,7 @@ echo "Installing link program"
 [[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/link
-mkdir /home/pi/link
+mkdir -p /home/pi/link
 
 read -p "Provide your API Authentication-Token: " token
 read -p "Provide Distance Device Id: " distance
