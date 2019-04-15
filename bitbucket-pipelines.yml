@@ -6,13 +6,20 @@ definitions:
         name: Raspbian Setup
         script:
           - bash raspbiansetup.sh
+        services:
+          - docker
+        caches:
+          - docker
     - step: &install-rgb
           name: Install RGB
           script:
             - bash install_rgb.sh
+          services:
+            - docker
+          caches:
+            - docker
 
 pipelines:
   default:
-    - parallel:
-      - step: *install-rgb
-      - step: *raspbian-setup
+    - step: *raspbian-setup
+    - step: *install-rgb
