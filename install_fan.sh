@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installing fan program"
 
 echo """
@@ -16,7 +16,7 @@ GPIO mapping
 ------------------------------------
 
 """
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/fan
 mkdir /home/pi/fan
@@ -75,6 +75,6 @@ if grep -q "no crontab" /tmp/crontabentry; then
   crontab /tmp/crontabentry
 fi
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0

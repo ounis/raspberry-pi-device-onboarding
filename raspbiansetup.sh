@@ -1,9 +1,9 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Insttalling a Raspberry Pi"
 echo "Install Mosqitto"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cd /tmp
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
 sudo apt-key add mosquitto-repo.gpg.key
@@ -12,9 +12,9 @@ sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
 sudo apt-get update -y
 sudo apt-get install -y mosquitto mosquitto-clients
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Install some other dependencies (Could be skipped)"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 sudo apt-get install -y python-smbus
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python-pip
@@ -22,9 +22,9 @@ sudo apt-get install -y python-requests
 sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 rm -rf /home/pi/raspberrypi
 mkdir /home/pi/raspberrypi
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
@@ -32,16 +32,16 @@ read -p "Provide your Tenant name: " tenant
 read -p "Provide your Device name: " device
 openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$tenant/CN=$device'
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Your device certificate is:"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cat /home/pi/raspberrypi/device_cert.pem
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Please copy and paste it in your device certificate section in OLT platform"
 
 
 echo "Save OLT certificate"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 
 cat << 'EOF' > /home/pi/raspberrypi/olt_ca.pem
 -----BEGIN CERTIFICATE-----
@@ -59,10 +59,10 @@ NwryIKRR9fgCIQDKqKmKv1STjPEePu4NL2YEqsVauaVl4CVQIYVjEwN3cw==
 -----END CERTIFICATE-----
 EOF
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Prepare to send ip address to your device in OLT platform"
 echo "Make sure your device has in the configuration a String entry called ipaddress"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cat << 'EOF' > /home/pi/raspberrypi/ipmqtt.sh
 #!/bin/bash
 
@@ -107,6 +107,6 @@ Please Make sure your Device type has a structure similar to this one
 
 """
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0

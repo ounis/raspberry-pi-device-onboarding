@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installing screen program"
 
 echo """
@@ -26,7 +26,7 @@ GPIO mapping
 --------------------------
 
 """
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/screen
 mkdir /home/pi/screen
@@ -37,9 +37,9 @@ read -p "Provide your Device name (or Id): " device
 read -p "Provide your Device  Id: " deviceId
 openssl req -new -key /home/pi/screen/device_key.pem -x509 -days 365 -out /home/pi/screen/device_cert.pem -subj '/O=$tenant/CN=$device'
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cat /home/pi/screen/device_cert.pem
 
 cat << 'EOF' > /home/pi/screen/screen.py
@@ -347,6 +347,6 @@ Please Make sure your Device type has a structure similar to this one
 
 """
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0

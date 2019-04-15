@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installing camera program"
 
 echo """
@@ -8,7 +8,7 @@ A Raspberry Pi V2.1 8MP 1080P Camera was used to test this script, but other kin
 Please don't forget to enable the camera in your raspi-config
 
 """
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/camera
 mkdir /home/pi/camera
@@ -18,9 +18,9 @@ read -p "Provide your Tenant name (or Id): " tenant
 read -p "Provide your Device name (or Id): " device
 openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$tenant/CN=$device'
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cat /home/pi/camera/device_cert.pem
 
 cat << 'EOF' > /home/pi/camera/camera.py
@@ -149,6 +149,6 @@ Please Make sure your Device type has a structure similar to this one
 }
 """
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0

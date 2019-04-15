@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installing presence program"
 
 echo """
@@ -17,7 +17,7 @@ GPIO mapping
 -------------------------
 
 """
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 
 rm -rf /home/pi/presence
 mkdir /home/pi/presence
@@ -27,9 +27,9 @@ read -p "Provide your Tenant name (or Id): " tenant
 read -p "Provide your Device name (or Id): " device
 openssl req -new -key /home/pi/presence/device_key.pem -x509 -days 365 -out /home/pi/presence/device_cert.pem -subj '/O=$tenant/CN=$device'
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
 cat /home/pi/presence/device_cert.pem
 
 cat << 'EOF' > /home/pi/presence/presence.py
@@ -101,6 +101,6 @@ Please Make sure your Device type has a structure similar to this one
 
 """
 
-tput setaf 2
+[[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
-tput sgr0
+[[ $- == *i* ]] && tput sgr0
