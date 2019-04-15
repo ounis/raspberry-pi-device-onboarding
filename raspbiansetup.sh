@@ -6,8 +6,6 @@ echo "Insttalling a Raspberry Pi"
 echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
-sudo apt-get update -y
-sudo apt install -y wget
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
 sudo apt-key add mosquitto-repo.gpg.key
 cd /etc/apt/sources.list.d/
@@ -18,7 +16,6 @@ sudo apt-get install -y mosquitto mosquitto-clients
 [[ $- == *i* ]] && tput setaf 2
 echo "Install some other dependencies (Could be skipped)"
 [[ $- == *i* ]] && tput sgr0
-sudo apt-get install -y cron
 sudo apt-get install -y python-smbus
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python-pip
