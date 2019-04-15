@@ -10,6 +10,46 @@ definitions:
           - docker
         caches:
           - docker
+    - step: &install-camera
+          name: Install Camera
+          script:
+            - bash install_camera.sh
+          services:
+            - docker
+          caches:
+            - docker
+    - step: &install-distance
+          name: Install Distance
+          script:
+            - bash install_distance.sh
+          services:
+            - docker
+          caches:
+            - docker
+    - step: &install-fan
+          name: Install Fan
+          script:
+            - bash install_fan.sh
+          services:
+            - docker
+          caches:
+            - docker
+    - step: &install-link
+          name: Install Link
+          script:
+            - bash install_link.sh
+          services:
+            - docker
+          caches:
+            - docker
+    - step: &install-presence
+          name: Install Presence
+          script:
+            - bash install_presence.sh
+          services:
+            - docker
+          caches:
+            - docker
     - step: &install-rgb
           name: Install RGB
           script:
@@ -18,8 +58,22 @@ definitions:
             - docker
           caches:
             - docker
+    - step: &install-screen
+          name: Install Screen
+          script:
+            - bash install_screen.sh
+          services:
+            - docker
+          caches:
+            - docker
 
 pipelines:
   default:
     - step: *raspbian-setup
+    - step: *install-camera
+    - step: *install-distance
+    - step: *install-fan
+    - step: *install-link
+    - step: *install-presence
     - step: *install-rgb
+    - step: *install-screen
