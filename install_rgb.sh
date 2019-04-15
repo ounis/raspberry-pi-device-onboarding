@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tput -T linux setaf 2
+tput setaf 2
 echo "Installing rgb program"
 
 echo """
