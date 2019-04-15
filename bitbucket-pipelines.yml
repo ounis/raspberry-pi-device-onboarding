@@ -1,4 +1,4 @@
-image: ryankurte/docker-rpi-emu
+image: ounishatem/docker-rpi-emu
 
 definitions:
   steps:
@@ -73,7 +73,7 @@ pipelines:
     - step: *install-camera
     - step: *install-distance
     - step: *install-fan
-    - step: *install-link
     - step: *install-presence
     - step: *install-rgb
     - step: *install-screen
+    - step: *install-link
