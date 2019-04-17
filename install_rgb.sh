@@ -38,6 +38,7 @@ openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/
 
 if [ ! -n "$OLT_SCREEN_DEVICE_ID" ]; then
   read -p "Provide your Device  Id: " OLT_RGB_DEVICE_ID;
+fi
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
