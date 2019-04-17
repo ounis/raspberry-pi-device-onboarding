@@ -129,7 +129,7 @@ EOF
 
 chmod +x /home/pi/camera/cron.sh
 
-crontab -l > /tmp/crontabentry 2>&1
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
   echo -e "\n* * * * * /home/pi/camera/ipmqtt.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
