@@ -26,9 +26,14 @@ fi
 mkdir -p /home/pi/presence
 
 openssl ecparam -out /home/pi/presence/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-openssl req -new -key /home/pi/presence/device_key.pem -x509 -days 365 -out /home/pi/presence/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -z ${OLT_TENANT} ] then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
+
+if [ ! -z ${OLT_PRESENCE_DEVICE} ] then
+  read -p "Provide your Device name: " OLT_PRESENCE_DEVICE;
+fi
+openssl req -new -key /home/pi/presence/device_key.pem -x509 -days 365 -out /home/pi/presence/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_PRESENCE_DEVICE'
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"

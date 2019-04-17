@@ -31,14 +31,15 @@ if [ -d /home/pi/raspberrypi ]; then
 fi
 
 mkdir /home/pi/raspberrypi
-# Genereate enough entropy inside the container to generate the ssl key
-{while [ ! -d /home/pi/raspberrypi/device_key.pem ] do
-  find / > /dev/null 2>&1
-done} &
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name: " tenant
-read -p "Provide your Device name: " device
-openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -z ${OLT_TENANT} ] then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
+
+if [ ! -z ${OLT_RASPBERRY_DEVICE} ] then
+  read -p "Provide your Device name: " OLT_RASPBERRY_DEVICE;
+fi
+openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RASPBERRY_DEVICE'
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Your device certificate is:"

@@ -17,9 +17,14 @@ fi
 mkdir -p /home/pi/camera
 
 openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -z ${OLT_TENANT} ] then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
+
+if [ ! -z ${OLT_CAMERA_DEVICE} ] then
+  read -p "Provide your Device name: " OLT_CAMERA_DEVICE;
+fi
+openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_CAMERA_DEVICE'
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"

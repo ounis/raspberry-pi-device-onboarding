@@ -35,10 +35,18 @@ fi
 mkdir -p /home/pi/screen
 
 openssl ecparam -out /home/pi/screen/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-read -p "Provide your Device  Id: " deviceId
-openssl req -new -key /home/pi/screen/device_key.pem -x509 -days 365 -out /home/pi/screen/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -z ${OLT_TENANT} ] then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
+
+if [ ! -z ${OLT_SCREEN_DEVICE} ] then
+  read -p "Provide your Device name: " OLT_SCREEN_DEVICE;
+fi
+openssl req -new -key /home/pi/screen/device_key.pem -x509 -days 365 -out /home/pi/screen/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_SCREEN_DEVICE'
+
+if [ ! -z ${OLT_SCREEN_DEVICE_ID} ] then
+  read -p "Provide your Device  Id: " OLT_SCREEN_DEVICE_ID;
+fi
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
