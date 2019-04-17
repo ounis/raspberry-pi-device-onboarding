@@ -74,7 +74,7 @@ private = "/home/pi/rgb/device_key.pem"
 
 EOF
 
-echo "deviceId = \"$deviceId\"" >> /home/pi/rgb/rgb.py
+echo "deviceId = \"$OLT_RGB_DEVICE_ID\"" >> /home/pi/rgb/rgb.py
 
 cat << 'EOF' >> /home/pi/rgb/rgb.py
 

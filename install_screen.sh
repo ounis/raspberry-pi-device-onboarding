@@ -295,7 +295,7 @@ def on_connect(client, userdata, flags, rc):
 
 EOF
 
-echo "    mqttc.subscribe(\"devices/$deviceId/actions\")" >> /home/pi/screen/screen.py
+echo "    mqttc.subscribe(\"devices/$OLT_SCREEN_DEVICE_ID/actions\")" >> /home/pi/screen/screen.py
 
 cat << 'EOF' >> /home/pi/screen/screen.py
 mqttc = mqtt.Client()
