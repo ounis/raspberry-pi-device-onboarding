@@ -21,23 +21,23 @@ GPIO mapping:
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/rgb ]; then
+if [ -d /home/pi/rgb ] then
   rm -rf /home/pi/rgb
 fi
 mkdir -p /home/pi/rgb
 
 openssl ecparam -out /home/pi/rgb/device_key.pem -name prime256v1 -genkey
 if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT;
+  read -p "Provide your Tenant name: " OLT_TENANT
 fi
 
 if [ ! -z ${OLT_RGB_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_RGB_DEVICE;
+  read -p "Provide your Device name: " OLT_RGB_DEVICE
 fi
 openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/rgb/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RGB_DEVICE'
 
 if [ ! -z ${OLT_SCREEN_DEVICE_ID} ] then
-  read -p "Provide your Device  Id: " OLT_RGB_DEVICE_ID;
+  read -p "Provide your Device  Id: " OLT_RGB_DEVICE_ID
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Add this certificate to your device"
@@ -123,11 +123,11 @@ EOF
 chmod +x /home/pi/rgb/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "rgb/cron.sh" /tmp/crontabentry; then
+if ! grep -q "rgb/cron.sh" /tmp/crontabentry then
   echo '* * * * * /home/pi/rgb/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
+if grep -q "no crontab" /tmp/crontabentry then
   echo '* * * * * /home/pi/rgb/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

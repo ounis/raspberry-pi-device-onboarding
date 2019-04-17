@@ -26,18 +26,18 @@ sudo pip install paho-mqtt
 [[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
-if [ -d /home/pi/raspberrypi ]; then
+if [ -d /home/pi/raspberrypi ] then
   rm -rf /home/pi/raspberrypi
 fi
 
 mkdir /home/pi/raspberrypi
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT;
+  read -p "Provide your Tenant name: " OLT_TENANT
 fi
 
 if [ ! -z ${OLT_RASPBERRY_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_RASPBERRY_DEVICE;
+  read -p "Provide your Device name: " OLT_RASPBERRY_DEVICE
 fi
 openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RASPBERRY_DEVICE'
 
@@ -94,11 +94,11 @@ EOF
 chmod +x /home/pi/raspberrypi/ipmqtt.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
+if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry then
   echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
+if grep -q "no crontab" /tmp/crontabentry then
   echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

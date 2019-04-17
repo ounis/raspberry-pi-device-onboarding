@@ -20,18 +20,18 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/presence ]; then
+if [ -d /home/pi/presence ] then
   rm -rf /home/pi/presence
 fi
 mkdir -p /home/pi/presence
 
 openssl ecparam -out /home/pi/presence/device_key.pem -name prime256v1 -genkey
 if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT;
+  read -p "Provide your Tenant name: " OLT_TENANT
 fi
 
 if [ ! -z ${OLT_PRESENCE_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_PRESENCE_DEVICE;
+  read -p "Provide your Device name: " OLT_PRESENCE_DEVICE
 fi
 openssl req -new -key /home/pi/presence/device_key.pem -x509 -days 365 -out /home/pi/presence/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_PRESENCE_DEVICE'
 
@@ -87,11 +87,11 @@ EOF
 chmod +x /home/pi/presence/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "presence/cron.sh" /tmp/crontabentry; then
+if ! grep -q "presence/cron.sh" /tmp/crontabentry then
   echo '* * * * * /home/pi/presence/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
+if grep -q "no crontab" /tmp/crontabentry then
   echo '* * * * * /home/pi/presence/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

@@ -22,18 +22,18 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/distance ]; then
+if [ -d /home/pi/distance ] then
   rm -rf /home/pi/distance
 fi
 mkdir -p /home/pi/distance
 
 openssl ecparam -out /home/pi/distance/device_key.pem -name prime256v1 -genkey
 if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT;
+  read -p "Provide your Tenant name: " OLT_TENANT
 fi
 
 if [ ! -z ${OLT_DISTANCE_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_DISTANCE_DEVICE;
+  read -p "Provide your Device name: " OLT_DISTANCE_DEVICE
 fi
 openssl req -new -key /home/pi/distance/device_key.pem -x509 -days 365 -out /home/pi/distance/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_DISTANCE_DEVICE'
 
@@ -230,11 +230,11 @@ EOF
 chmod +x /home/pi/distance/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
+if ! grep -q "distance/cron.sh" /tmp/crontabentry then
   echo '* * * * * /home/pi/distance/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
+if grep -q "no crontab" /tmp/crontabentry then
   echo '* * * * * /home/pi/distance/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

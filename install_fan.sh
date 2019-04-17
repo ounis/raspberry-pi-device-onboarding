@@ -19,7 +19,7 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/fan ]; then
+if [ -d /home/pi/fan ] then
   rm -rf /home/pi/fan
 fi
 mkdir -p /home/pi/fan
@@ -69,11 +69,11 @@ EOF
 chmod +x /home/pi/fan/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "fan/cron.sh" /tmp/crontabentry; then
+if ! grep -q "fan/cron.sh" /tmp/crontabentry then
   echo '* * * * * /home/pi/fan/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
+if grep -q "no crontab" /tmp/crontabentry then
   echo '* * * * * /home/pi/fan/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
