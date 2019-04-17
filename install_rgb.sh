@@ -36,7 +36,7 @@ if [ ! -n "$OLT_RGB_DEVICE" ]; then
 fi
 openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/rgb/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RGB_DEVICE'
 
-if [ ! -n "$OLT_SCREEN_DEVICE_ID" ]; then
+if [ ! -n "$OLT_RGB_DEVICE_ID" ]; then
   read -p "Provide your Device  Id: " OLT_RGB_DEVICE_ID;
 fi
 
