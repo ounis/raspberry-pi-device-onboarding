@@ -330,15 +330,17 @@ EOF
 
 chmod +x /home/pi/screen/cron.sh
 
-crontab -l > /tmp/crontabentry 2>&1
-if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/screen/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/screen/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
+if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/screen/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+
+crontab -l
 
 echo """
 Please Make sure your Device type has a structure similar to this one
@@ -361,3 +363,4 @@ Please Make sure your Device type has a structure similar to this one
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

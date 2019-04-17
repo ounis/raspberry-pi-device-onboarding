@@ -7,7 +7,7 @@ echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
-sudo apt-key add mosquitto-repo.gpg.key
+apt-key add mosquitto-repo.gpg.key
 cd /etc/apt/sources.list.d/
 sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
 sudo apt-get update -y
@@ -93,7 +93,7 @@ EOF
 
 chmod +x /home/pi/raspberrypi/ipmqtt.sh
 
-crontab -l > /tmp/crontabentry 2>&1
+crontab -l > /tmp/crontabentry 2>&1 || true
 if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
@@ -102,6 +102,8 @@ if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
+
+crontab -l
 
 echo """
 Please Make sure your Device type has a structure similar to this one
@@ -119,3 +121,4 @@ Please Make sure your Device type has a structure similar to this one
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

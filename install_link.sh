@@ -76,16 +76,19 @@ EOF
 
 chmod +x /home/pi/link/cron.sh
 
-crontab -l > /tmp/crontabentry 2>&1
-if ! grep -q "link/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/link/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
+if ! grep -q "link/cron.sh" /tmp/crontabentry; then
+  echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+
+crontab -l
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0
