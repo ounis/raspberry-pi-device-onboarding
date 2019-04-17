@@ -11,18 +11,18 @@ Please don't forget to enable the camera in your raspi-config
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/camera ] then
-  rm -rf /home/pi/camera
+if [ -d /home/pi/camera ]; then
+  rm -rf /home/pi/camera;
 fi
 mkdir -p /home/pi/camera
 
 openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey
-if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT
+if [ ! -z ${OLT_TENANT} ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
 fi
 
-if [ ! -z ${OLT_CAMERA_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_CAMERA_DEVICE
+if [ ! -z ${OLT_CAMERA_DEVICE} ]; then
+  read -p "Provide your Device name: " OLT_CAMERA_DEVICE;
 fi
 openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_CAMERA_DEVICE'
 
@@ -130,11 +130,11 @@ EOF
 chmod +x /home/pi/camera/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "camera/cron.sh" /tmp/crontabentry then
+if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/camera/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry then
+if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/camera/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

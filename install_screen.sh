@@ -29,23 +29,23 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/screen ] then
-  rm -rf /home/pi/screen
+if [ -d /home/pi/screen ]; then
+  rm -rf /home/pi/screen;
 fi
 mkdir -p /home/pi/screen
 
 openssl ecparam -out /home/pi/screen/device_key.pem -name prime256v1 -genkey
-if [ ! -z ${OLT_TENANT} ] then
-  read -p "Provide your Tenant name: " OLT_TENANT
+if [ ! -z ${OLT_TENANT} ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
 fi
 
-if [ ! -z ${OLT_SCREEN_DEVICE} ] then
-  read -p "Provide your Device name: " OLT_SCREEN_DEVICE
+if [ ! -z ${OLT_SCREEN_DEVICE} ]; then
+  read -p "Provide your Device name: " OLT_SCREEN_DEVICE;
 fi
 openssl req -new -key /home/pi/screen/device_key.pem -x509 -days 365 -out /home/pi/screen/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_SCREEN_DEVICE'
 
-if [ ! -z ${OLT_SCREEN_DEVICE_ID} ] then
-  read -p "Provide your Device  Id: " OLT_SCREEN_DEVICE_ID
+if [ ! -z ${OLT_SCREEN_DEVICE_ID} ]; then
+  read -p "Provide your Device  Id: " OLT_SCREEN_DEVICE_ID;
 fi
 
 [[ $- == *i* ]] && tput setaf 2
@@ -331,11 +331,11 @@ EOF
 chmod +x /home/pi/screen/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "screen/cron.sh" /tmp/crontabentry then
+if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/screen/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry then
+if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/screen/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi

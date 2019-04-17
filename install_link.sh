@@ -5,21 +5,21 @@ set -e
 echo "Installing link program"
 [[ $- == *i* ]] && tput sgr0
 
-if [ -d /home/pi/link ] then
-  rm -rf /home/pi/link
+if [ -d /home/pi/link ]; then
+  rm -rf /home/pi/link;
 fi
 mkdir -p /home/pi/link
 
-if [ ! -z ${OLT_TOKEN} ] then
-  read -p "Provide your API Authentication-Token: " OLT_TOKEN
+if [ ! -z ${OLT_TOKEN} ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
 
-if [ ! -z ${OLT_DISTANCE_DEVICE} ] then
-  read -p "Provide Distance Device Id: " OLT_DISTANCE_DEVICE
+if [ ! -z ${OLT_DISTANCE_DEVICE} ]; then
+  read -p "Provide Distance Device Id: " OLT_DISTANCE_DEVICE;
 fi
 
-if [ ! -z ${OLT_SCREEN_DEVICE} ] then
-  read -p "Provide Screen Device Id: " OLT_SCREEN_DEVICE
+if [ ! -z ${OLT_SCREEN_DEVICE} ]; then
+  read -p "Provide Screen Device Id: " OLT_SCREEN_DEVICE;
 fi
 
 cat << 'EOF' > /home/pi/link/link.py
@@ -77,11 +77,11 @@ EOF
 chmod +x /home/pi/link/cron.sh
 
 crontab -l > /tmp/crontabentry
-if ! grep -q "link/cron.sh" /tmp/crontabentry then
+if ! grep -q "link/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry then
+if grep -q "no crontab" /tmp/crontabentry; then
   echo '* * * * * /home/pi/link/cron.sh' > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
