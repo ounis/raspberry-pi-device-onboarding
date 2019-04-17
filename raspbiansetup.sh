@@ -94,12 +94,12 @@ EOF
 chmod +x /home/pi/raspberrypi/ipmqtt.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
-if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' >> /tmp/crontabentry
+if grep -q "no crontab" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' > /tmp/crontabentry
+if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

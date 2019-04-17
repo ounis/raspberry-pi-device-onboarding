@@ -231,11 +231,11 @@ chmod +x /home/pi/distance/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/distance/cron.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/ipmqtt.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/distance/cron.sh' >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/ipmqtt.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

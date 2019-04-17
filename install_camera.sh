@@ -131,11 +131,11 @@ chmod +x /home/pi/camera/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/ipmqtt.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/ipmqtt.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
