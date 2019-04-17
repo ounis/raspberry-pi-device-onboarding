@@ -122,7 +122,7 @@ EOF
 
 chmod +x /home/pi/rgb/cron.sh
 
-crontab -l > /tmp/crontabentry
+crontab -l > /tmp/crontabentry 2>&1
 if ! grep -q "rgb/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/rgb/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry

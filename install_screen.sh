@@ -330,7 +330,7 @@ EOF
 
 chmod +x /home/pi/screen/cron.sh
 
-crontab -l > /tmp/crontabentry
+crontab -l > /tmp/crontabentry 2>&1
 if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/screen/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry

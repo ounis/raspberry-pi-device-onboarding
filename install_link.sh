@@ -76,7 +76,7 @@ EOF
 
 chmod +x /home/pi/link/cron.sh
 
-crontab -l > /tmp/crontabentry
+crontab -l > /tmp/crontabentry 2>&1
 if ! grep -q "link/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry

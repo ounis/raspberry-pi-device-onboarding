@@ -129,7 +129,7 @@ EOF
 
 chmod +x /home/pi/camera/cron.sh
 
-crontab -l > /tmp/crontabentry
+crontab -l > /tmp/crontabentry 2>&1
 if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
   echo '* * * * * /home/pi/camera/cron.sh' >> /tmp/crontabentry
   crontab /tmp/crontabentry
