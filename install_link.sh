@@ -10,15 +10,15 @@ if [ -d /home/pi/link ]; then
 fi
 mkdir -p /home/pi/link
 
-if [ ! -z ${OLT_TOKEN} ]; then
+if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
 
-if [ ! -z ${OLT_DISTANCE_DEVICE} ]; then
+if [ ! -n "$OLT_DISTANCE_DEVICE" ]; then
   read -p "Provide Distance Device Id: " OLT_DISTANCE_DEVICE;
 fi
 
-if [ ! -z ${OLT_SCREEN_DEVICE} ]; then
+if [ ! -n "$OLT_SCREEN_DEVICE" ]; then
   read -p "Provide Screen Device Id: " OLT_SCREEN_DEVICE;
 fi
 
