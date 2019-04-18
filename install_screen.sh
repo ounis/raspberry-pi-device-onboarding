@@ -29,6 +29,46 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_SCREEN_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Screen_$dt\",
+  \"schema\": {
+    \"actions\": {
+      \"updateNumber\": {
+        \"type\": \"object\",
+        \"properties\": {
+          \"number\": {
+            \"type\": \"string\"
+          }
+        }
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_SCREEN_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Screen_$dt\",
+    \"deviceTypeId\": \"$OLT_SCREEN_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
 if [ -d /home/pi/screen ]; then
   rm -rf /home/pi/screen;
 fi
@@ -44,14 +84,16 @@ if [ ! -n "$OLT_SCREEN_DEVICE" ]; then
 fi
 openssl req -new -key /home/pi/screen/device_key.pem -x509 -days 365 -out /home/pi/screen/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_SCREEN_DEVICE'
 
-if [ ! -n "$OLT_SCREEN_DEVICE_ID" ]; then
-  read -p "Provide your Device  Id: " OLT_SCREEN_DEVICE_ID;
-fi
-
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/screen/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/screen/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_SCREEN_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/screen/screen.py
 #!/usr/bin/python
@@ -295,7 +337,7 @@ def on_connect(client, userdata, flags, rc):
 
 EOF
 
-echo "    mqttc.subscribe(\"devices/$OLT_SCREEN_DEVICE_ID/actions\")" >> /home/pi/screen/screen.py
+echo "    mqttc.subscribe(\"devices/$OLT_SCREEN_DEVICE/actions\")" >> /home/pi/screen/screen.py
 
 cat << 'EOF' >> /home/pi/screen/screen.py
 mqttc = mqtt.Client()
@@ -342,23 +384,21 @@ fi
 
 crontab -l
 
-echo """
-Please Make sure your Device type has a structure similar to this one
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device"
+[[ $- == *i* ]] && tput sgr0
 
-{
-  \"actions\": {
-    \"updateNumber\": {
-      \"type\": \"object\",
-      \"properties\": {
-        \"number\": {
-          \"type\": \"string\"
-        }
-      }
-    }
-  }
-}
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_SCREEN_DEVICE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
 
-"""
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device Type"
+[[ $- == *i* ]] && tput sgr0
+
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/device-types/$OLT_SCREEN_DEVICE_TYPE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

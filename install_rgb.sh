@@ -21,6 +21,52 @@ GPIO mapping:
 """
 [[ $- == *i* ]] && tput sgr0
 
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_RGB_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Rgb_$dt\",
+  \"schema\": {
+    \"actions\": {
+      \"ambientLight\": {
+        \"type\": \"object\",
+        \"properties\": {
+          \"b\": {
+            \"type\": \"string\"
+          },
+          \"g\": {
+            \"type\": \"string\"
+          },
+          \"r\": {
+            \"type\": \"string\"
+          }
+        }
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_RGB_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Rgb_$dt\",
+    \"deviceTypeId\": \"$OLT_RGB_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
 if [ -d /home/pi/rgb ]; then
   rm -rf /home/pi/rgb;
 fi
@@ -36,14 +82,16 @@ if [ ! -n "$OLT_RGB_DEVICE" ]; then
 fi
 openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/rgb/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RGB_DEVICE'
 
-if [ ! -n "$OLT_RGB_DEVICE_ID" ]; then
-  read -p "Provide your Device  Id: " OLT_RGB_DEVICE_ID;
-fi
-
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/rgb/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/rgb/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RGB_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/rgb/rgb.py
 #!/usr/bin/python
@@ -74,7 +122,7 @@ private = "/home/pi/rgb/device_key.pem"
 
 EOF
 
-echo "deviceId = \"$OLT_RGB_DEVICE_ID\"" >> /home/pi/rgb/rgb.py
+echo "deviceId = \"$OLT_RGB_DEVICE\"" >> /home/pi/rgb/rgb.py
 
 cat << 'EOF' >> /home/pi/rgb/rgb.py
 
@@ -135,29 +183,21 @@ fi
 
 crontab -l
 
-echo """
-Please Make sure your Device type has a structure similar to this one
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device"
+[[ $- == *i* ]] && tput sgr0
 
-{
-  \"actions\": {
-    \"ambientLight\": {
-      \"type\": \"object\",
-      \"properties\": {
-        \"b\": {
-          \"type\": \"string\"
-        },
-        \"g\": {
-          \"type\": \"string\"
-        },
-        \"r\": {
-          \"type\": \"string\"
-        }
-      }
-    }
-  }
-}
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RGB_DEVICE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
 
-"""
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device Type"
+[[ $- == *i* ]] && tput sgr0
+
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/device-types/$OLT_RGB_DEVICE_TYPE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

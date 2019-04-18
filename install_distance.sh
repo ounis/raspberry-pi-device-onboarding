@@ -299,18 +299,6 @@ curl -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_DISTANCE_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
-echo """
-Please Make sure your Device type has a structure similar to this one
-
-{
-  \"configuration\": {
-    \"distance\": {
-      \"type\": \"string\"
-    }
-}
-
-"""
-
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
