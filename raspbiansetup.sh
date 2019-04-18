@@ -24,12 +24,46 @@ sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
 
 [[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"RaspberryPi$dt\",
+  \"schema\": {
+    \"configuration\": {
+      \"ipaddress\": {
+        \"type\": \"string\"
+      }
+    }
+  }
+}"| \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+OLT_RASPBERRY_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"RaspberryPi$dt\",
+    \"deviceTypeId\": \"$OLT_RASPBERRY_DEVICE_TYPE\"
+  }
+}"| \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
 if [ -d /home/pi/raspberrypi ]; then
   rm -rf /home/pi/raspberrypi;
 fi
-
 mkdir /home/pi/raspberrypi
 openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
 if [ ! -n "$OLT_TENANT" ]; then
@@ -44,11 +78,17 @@ openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /
 [[ $- == *i* ]] && tput setaf 2
 echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/raspberrypi/device_cert.pem
+OLT_DEVICE_CERTIFICATE=cat /home/pi/raspberrypi/device_cert.pem
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"cert\": \"$OLT_DEVICE_CERTIFICATE\",
+  \"status\": \"valid\"
+}"
+
 [[ $- == *i* ]] && tput setaf 2
-echo "Please copy and paste it in your device certificate section in OLT platform"
-
-
 echo "Save OLT certificate"
 [[ $- == *i* ]] && tput sgr0
 
@@ -70,7 +110,6 @@ EOF
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Prepare to send ip address to your device in OLT platform"
-echo "Make sure your device has in the configuration a String entry called ipaddress"
 [[ $- == *i* ]] && tput sgr0
 cat << 'EOF' > /home/pi/raspberrypi/ipmqtt.sh
 #!/bin/bash
@@ -104,19 +143,6 @@ if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
 fi
 
 crontab -l
-
-echo """
-Please Make sure your Device type has a structure similar to this one
-
-{
-  \"configuration\": {
-    \"ipaddress\": {
-      \"type\": \"string\"
-    }
-  }
-}
-
-"""
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

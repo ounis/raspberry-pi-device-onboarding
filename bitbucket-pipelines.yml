@@ -5,8 +5,8 @@ definitions:
     - step: &raspbian-setup
         name: Raspbian Setup
         script:
-          - export OLT_TENANT=Hatemorg
-          - export OLT_RASPBERRY_DEVICE=White
+          - export OLT_TOKEN="${OLT_TOKEN}"
+          - export OLT_TENANT="${OLT_TENANT}"
           - bash raspbiansetup.sh
         services:
           - docker
@@ -15,8 +15,8 @@ definitions:
     - step: &install-camera
           name: Install Camera
           script:
-            - export OLT_TENANT=Hatemorg
-            - export OLT_CAMERA_DEVICE=Camera
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_camera.sh
           services:
             - docker
@@ -25,8 +25,8 @@ definitions:
     - step: &install-distance
           name: Install Distance
           script:
-            - export OLT_TENANT=Hatemorg
-            - export OLT_DISTANCE_DEVICE=Distance
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_distance.sh
           services:
             - docker
@@ -43,9 +43,8 @@ definitions:
     - step: &install-link
           name: Install Link
           script:
-            - export OLT_TOKEN=SomeToken
-            - export OLT_DISTANCE_DEVICE=41d8342f-5a99-4ebe-a6cb-6a7553c9eb62
-            - export OLT_SCREEN_DEVICE=fcc8a4ec-bec2-439b-862c-1c930ca8d0b1
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_link.sh
           services:
             - docker
@@ -54,8 +53,8 @@ definitions:
     - step: &install-presence
           name: Install Presence
           script:
-            - export OLT_TENANT=Hatemorg
-            - export OLT_PRESENCE_DEVICE=Presence
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_presence.sh
           services:
             - docker
@@ -64,9 +63,8 @@ definitions:
     - step: &install-rgb
           name: Install RGB
           script:
-            - export OLT_TENANT=Hatemorg
-            - export OLT_RGB_DEVICE=Rgb
-            - export OLT_RGB_DEVICE_ID=SomeId
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_rgb.sh
           services:
             - docker
@@ -75,9 +73,8 @@ definitions:
     - step: &install-screen
           name: Install Screen
           script:
-            - export OLT_TENANT=Hatemorg
-            - export OLT_SCREEN_DEVICE=Screen
-            - export OLT_SCREEN_DEVICE_ID=fcc8a4ec-bec2-439b-862c-1c930ca8d0b1
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
             - bash install_screen.sh
           services:
             - docker
