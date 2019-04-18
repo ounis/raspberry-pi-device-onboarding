@@ -183,21 +183,8 @@ fi
 
 crontab -l
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_RGB_DEVICE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
-
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device Type"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/device-types/$OLT_RGB_DEVICE_TYPE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
+echo $OLT_RGB_DEVICE_TYPE > out/rgb_type.txt
+echo $OLT_RGB_DEVICE > out/rgb.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

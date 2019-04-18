@@ -163,21 +163,8 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['configuration'
 
 diff <(echo "$IP_ADDRESS" ) <(echo `/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}'`)
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
-
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device Type"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/device-types/$OLT_RASPBERRY_DEVICE_TYPE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
+echo $OLT_RASPBERRY_DEVICE_TYPE > out/raspberry_type.txt
+echo $OLT_RASPBERRY_DEVICE > out/raspberry.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

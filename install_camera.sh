@@ -192,39 +192,8 @@ fi
 
 crontab -l
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
-
-[[ $- == *i* ]] && tput setaf 2
-echo "Delete Device Type"
-[[ $- == *i* ]] && tput sgr0
-
-curl -X DELETE \
-  "https://api.dev.olt-dev.io/v1/device-types/$OLT_CAMERA_DEVICE_TYPE" \
-  -H "Authorization: Bearer $OLT_TOKEN"
-
-echo """
-Please Make sure your Device type has a structure similar to this one
-
-{
-  \"configuration\": {
-    \"hash\": {
-      \"type\": \"string\"
-    },
-    \"chunk\": {
-      \"type\": \"integer\"
-    },
-    \"video\": {
-      \"type\": \"string\"
-    }
-  }
-}
-"""
+echo $OLT_CAMERA_DEVICE_TYPE > out/camera_type.txt
+echo $OLT_CAMERA_DEVICE > out/camera.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
