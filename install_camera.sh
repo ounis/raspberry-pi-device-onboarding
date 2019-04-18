@@ -64,7 +64,7 @@ openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/
 
 echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
+OLT_DEVICE_CERTIFICATE=$(</home/pi/camera/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
 curl -X POST \
