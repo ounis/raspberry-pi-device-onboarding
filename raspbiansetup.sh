@@ -32,7 +32,7 @@ OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
-  \"name\": \"RaspberryPi$dt\",
+  \"name\": \"RaspberryPi_$dt\",
   \"schema\": {
     \"configuration\": {
       \"ipaddress\": {
@@ -44,7 +44,7 @@ OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 [[ $- == *i* ]] && tput setaf 2
-echo "Create device type"
+echo "Create device"
 [[ $- == *i* ]] && tput sgr0
 OLT_RASPBERRY_DEVICE=`curl -X POST \
   https://api.dev.olt-dev.io/v1/devices \
@@ -52,7 +52,7 @@ OLT_RASPBERRY_DEVICE=`curl -X POST \
   -H 'Content-Type: application/json' \
   -d "{
   \"info\": {
-    \"name\": \"RaspberryPi$dt\",
+    \"name\": \"RaspberryPi_$dt\",
     \"deviceTypeId\": \"$OLT_RASPBERRY_DEVICE_TYPE\"
   }
 }"| \
@@ -81,7 +81,6 @@ echo "Your device certificate is:"
 OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
-echo $DATA
 curl -X POST \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \

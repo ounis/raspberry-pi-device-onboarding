@@ -11,6 +11,40 @@ Please don't forget to enable the camera in your raspi-config
 """
 [[ $- == *i* ]] && tput sgr0
 
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_CAMERA_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Camera_$dt\",
+  \"schema\": {
+    \"configuration\": {
+      \"ipaddress\": {
+        \"type\": \"string\"
+      }
+    }
+  }
+}"| \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_CAMERA_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Camera_$dt\",
+    \"deviceTypeId\": \"$OLT_CAMERA_DEVICE_TYPE\"
+  }
+}"| \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 
 if [ -d /home/pi/camera ]; then
@@ -28,10 +62,16 @@ if [ ! -n "$OLT_CAMERA_DEVICE" ]; then
 fi
 openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_CAMERA_DEVICE'
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/camera/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/camera/camera.py
 #!/usr/bin/python
@@ -142,6 +182,22 @@ if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
 fi
 
 crontab -l
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device"
+[[ $- == *i* ]] && tput sgr0
+
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Device Type"
+[[ $- == *i* ]] && tput sgr0
+
+curl -X DELETE \
+  "https://api.dev.olt-dev.io/v1/device-types/$OLT_CAMERA_DEVICE_TYPE" \
+  -H "Authorization: Bearer $OLT_TOKEN"
 
 echo """
 Please Make sure your Device type has a structure similar to this one
