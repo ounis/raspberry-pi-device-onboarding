@@ -22,6 +22,7 @@ sudo apt-get install -y python-pip
 sudo apt-get install -y python-requests
 sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
+sudo pip install RPi.GPIO
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
@@ -40,7 +41,7 @@ OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
       }
     }
   }
-}"| \
+}" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 [[ $- == *i* ]] && tput setaf 2
@@ -55,7 +56,7 @@ OLT_RASPBERRY_DEVICE=`curl -X POST \
     \"name\": \"RaspberryPi_$dt\",
     \"deviceTypeId\": \"$OLT_RASPBERRY_DEVICE_TYPE\"
   }
-}"| \
+}" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 [[ $- == *i* ]] && tput setaf 2
@@ -113,7 +114,15 @@ echo "Prepare to send ip address to your device in OLT platform"
 cat << 'EOF' > /home/pi/raspberrypi/ipmqtt.sh
 #!/bin/bash
 
-ip=`/sbin/ifconfig wlan0 | grep 'inet ' | awk '{print $2}'`
+EOF
+
+if [ ! -n "$NETWORK_INTERFACE" ]; then
+  read -p "Provide Device network interface (eth0, wlan0, etc...): " NETWORK_INTERFACE;
+fi
+
+echo "ip=\`/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print \$2}'\`" >> /home/pi/raspberrypi/ipmqtt.sh
+
+cat << 'EOF' >> /home/pi/raspberrypi/ipmqtt.sh
 
 msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s" } }' "$ip")
 
@@ -142,6 +151,17 @@ if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
 fi
 
 crontab -l
+
+/home/pi/raspberrypi/ipmqtt.sh
+
+sleep 5
+
+IP_ADDRESS=`curl -X GET \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/state" \
+  -H "Authorization: Bearer $OLT_TOKEN" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['configuration']['ipaddress'])"`
+
+diff <(echo "$IP_ADDRESS" ) <(echo `/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}'`)
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Delete Device"

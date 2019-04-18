@@ -12,6 +12,10 @@ Please don't forget to enable the camera in your raspi-config
 [[ $- == *i* ]] && tput sgr0
 
 [[ $- == *i* ]] && tput setaf 2
+echo "Install picamera"
+[[ $- == *i* ]] && tput sgr0
+
+[[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
 dt=`date +%s`
@@ -23,12 +27,18 @@ OLT_CAMERA_DEVICE_TYPE=`curl -X POST \
   \"name\": \"Camera_$dt\",
   \"schema\": {
     \"configuration\": {
-      \"ipaddress\": {
+      \"hash\": {
+        \"type\": \"string\"
+      },
+      \"chunk\": {
+        \"type\": \"integer\"
+      },
+      \"video\": {
         \"type\": \"string\"
       }
     }
   }
-}"| \
+}" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 [[ $- == *i* ]] && tput setaf 2
@@ -43,9 +53,8 @@ OLT_CAMERA_DEVICE=`curl -X POST \
     \"name\": \"Camera_$dt\",
     \"deviceTypeId\": \"$OLT_CAMERA_DEVICE_TYPE\"
   }
-}"| \
+}" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
-
 
 if [ -d /home/pi/camera ]; then
   rm -rf /home/pi/camera;
@@ -173,11 +182,11 @@ chmod +x /home/pi/camera/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/ipmqtt.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/camera.py\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/ipmqtt.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/camera.py\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

@@ -332,11 +332,11 @@ chmod +x /home/pi/screen/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/screen/ipmqtt.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/screen/screen.py\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/screen/ipmqtt.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/screen/screen.py\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
