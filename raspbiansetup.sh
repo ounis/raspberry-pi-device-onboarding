@@ -78,15 +78,15 @@ openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /
 [[ $- == *i* ]] && tput setaf 2
 echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-OLT_DEVICE_CERTIFICATE=cat /home/pi/raspberrypi/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+echo $DATA
 curl -X POST \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
-  -d "{
-  \"cert\": \"$OLT_DEVICE_CERTIFICATE\",
-  \"status\": \"valid\"
-}"
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Save OLT certificate"

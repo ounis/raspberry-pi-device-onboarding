@@ -11,6 +11,8 @@ Please don't forget to enable the camera in your raspi-config
 """
 [[ $- == *i* ]] && tput sgr0
 
+
+
 if [ -d /home/pi/camera ]; then
   rm -rf /home/pi/camera;
 fi
