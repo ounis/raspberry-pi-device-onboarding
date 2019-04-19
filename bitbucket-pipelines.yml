@@ -9,7 +9,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash raspbiansetup.sh
           artifacts:
-            - out/**.txt
+            - out/raspberry.txt
+            - out/raspberry_type.txt
       - step: &install-camera
           name: Install Camera
           script:
