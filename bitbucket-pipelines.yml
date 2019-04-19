@@ -18,7 +18,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_camera.sh
           artifacts:
-            - out/**.txt
+            - out/camera.txt
+            - out/camera_type.txt
       - step: &install-distance
           name: Install Distance
           script:
@@ -26,7 +27,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_distance.sh
           artifacts:
-            - out/**.txt
+            - out/distance.txt
+            - out/distance_type.txt
       - step: &install-fan
           name: Install Fan
           script:
@@ -45,7 +47,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_presence.sh
           artifacts:
-            - out/**.txt
+            - out/presence.txt
+            - out/presence_type.txt
       - step: &install-rgb
           name: Install RGB
           script:
@@ -53,7 +56,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_rgb.sh
           artifacts:
-            - out/**.txt
+            - out/rgb.txt
+            - out/rgb_type.txt
       - step: &install-screen
           name: Install Screen
           script:
@@ -61,7 +65,8 @@ definitions:
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_screen.sh
           artifacts:
-            - out/**.txt
+            - out/screen.txt
+            - out/screen_type.txt
       - step: &cleanup
           name: Cleanup
           script:
