@@ -8,10 +8,6 @@ definitions:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash raspbiansetup.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &install-camera
@@ -20,10 +16,6 @@ definitions:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_camera.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &install-distance
@@ -32,20 +24,12 @@ definitions:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_distance.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &install-fan
           name: Install Fan
           script:
             - bash install_fan.sh
-          services:
-            - docker
-          caches:
-            - docker
       - step: &install-link
           name: Install Link
           script:
@@ -53,20 +37,12 @@ definitions:
             - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
             - export OLT_DISTANCE_DEVICE=`cat out/distance.txt`
             - bash install_link.sh
-          services:
-            - docker
-          caches:
-            - docker
       - step: &install-presence
           name: Install Presence
           script:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_presence.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &install-rgb
@@ -75,10 +51,6 @@ definitions:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_rgb.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &install-screen
@@ -87,10 +59,6 @@ definitions:
             - export OLT_TOKEN="${OLT_TOKEN}"
             - export OLT_TENANT="${OLT_TENANT}"
             - bash install_screen.sh
-          services:
-            - docker
-          caches:
-            - docker
           artifacts:
             - out/**.txt
       - step: &cleanup
@@ -109,10 +77,6 @@ definitions:
             - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
             - export OLT_SCREEN_DEVICE_TYPE=`cat out/screen_type.txt`
             - bash cleanup.sh
-          services:
-            - docker
-          caches:
-            - docker
 
 pipelines:
   default:
