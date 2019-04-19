@@ -164,8 +164,11 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['configuration'
 diff <(echo "$IP_ADDRESS" ) <(echo `/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}'`)
 
 mkdir -p out
+ls -al
+ls -al out
 echo $OLT_RASPBERRY_DEVICE_TYPE > out/raspberry_type.txt
 echo $OLT_RASPBERRY_DEVICE > out/raspberry.txt
+ls -al out
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

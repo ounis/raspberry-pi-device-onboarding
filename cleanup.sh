@@ -6,7 +6,7 @@ set -e
 echo "Delete Camera"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -14,7 +14,7 @@ curl -X DELETE \
 echo "Delete Camera Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_CAMERA_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -22,7 +22,7 @@ curl -X DELETE \
 echo "Delete Distance"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_DISTANCE_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -30,7 +30,7 @@ curl -X DELETE \
 echo "Delete Distance Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_DISTANCE_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -38,7 +38,7 @@ curl -X DELETE \
 echo "Delete Presence"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_PRESENCE_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -46,7 +46,7 @@ curl -X DELETE \
 echo "Delete Presence Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_PRESENCE_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -54,7 +54,7 @@ curl -X DELETE \
 echo "Delete Rgb"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_RGB_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -62,7 +62,7 @@ curl -X DELETE \
 echo "Delete Rgb Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_RGB_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -70,7 +70,7 @@ curl -X DELETE \
 echo "Delete Screen"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_SCREEN_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -78,7 +78,7 @@ curl -X DELETE \
 echo "Delete Screen Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_SCREEN_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -86,7 +86,7 @@ curl -X DELETE \
 echo "Delete Raspberry"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE" \
   -H "Authorization: Bearer $OLT_TOKEN"
 
@@ -94,6 +94,6 @@ curl -X DELETE \
 echo "Delete Raspberry Type"
 [[ $- == *i* ]] && tput sgr0
 
-curl -X DELETE \
+curl -s -o /dev/null -w "%{http_code}" -X DELETE \
   "https://api.dev.olt-dev.io/v1/device-types/$OLT_RASPBERRY_DEVICE_TYPE" \
   -H "Authorization: Bearer $OLT_TOKEN"

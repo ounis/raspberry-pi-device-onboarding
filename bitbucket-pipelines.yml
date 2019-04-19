@@ -116,12 +116,13 @@ definitions:
 
 pipelines:
   default:
-    - step: *raspbian-setup
-    - step: *install-camera
-    - step: *install-distance
-    - step: *install-fan
-    - step: *install-presence
-    - step: *install-rgb
-    - step: *install-screen
+    - parallel:
+      - step: *raspbian-setup
+      - step: *install-camera
+      - step: *install-distance
+      - step: *install-fan
+      - step: *install-presence
+      - step: *install-rgb
+      - step: *install-screen
     - step: *install-link
     - step: *cleanup
