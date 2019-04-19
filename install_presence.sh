@@ -139,6 +139,7 @@ fi
 
 crontab -l
 
+mkdir out
 echo $OLT_PRESENCE_DEVICE_TYPE > out/presence_type.txt
 echo $OLT_PRESENCE_DEVICE > out/presence.txt
 

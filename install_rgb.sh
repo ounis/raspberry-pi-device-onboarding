@@ -183,6 +183,7 @@ fi
 
 crontab -l
 
+mkdir out
 echo $OLT_RGB_DEVICE_TYPE > out/rgb_type.txt
 echo $OLT_RGB_DEVICE > out/rgb.txt
 

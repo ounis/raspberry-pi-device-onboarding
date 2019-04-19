@@ -192,6 +192,7 @@ fi
 
 crontab -l
 
+mkdir out
 echo $OLT_CAMERA_DEVICE_TYPE > out/camera_type.txt
 echo $OLT_CAMERA_DEVICE > out/camera.txt
 
