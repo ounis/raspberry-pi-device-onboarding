@@ -283,8 +283,8 @@ fi
 
 crontab -l
 
-mkdir out
-echo $OLT_DISTANCE_DEVICE_TYPE > out/distance_type.txt
+mkdir -p out
+echo $OLT_DISTANCE_DEVICE_TYPE > tmp/distance_type.txt
 echo $OLT_DISTANCE_DEVICE > out/distance.txt
 
 [[ $- == *i* ]] && tput setaf 2

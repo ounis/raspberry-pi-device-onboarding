@@ -384,7 +384,7 @@ fi
 
 crontab -l
 
-mkdir out
+mkdir -p out
 echo $OLT_SCREEN_DEVICE_TYPE > out/screen_type.txt
 echo $OLT_SCREEN_DEVICE > out/screen.txt
 
