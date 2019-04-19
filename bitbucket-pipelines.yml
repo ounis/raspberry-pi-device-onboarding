@@ -2,117 +2,117 @@ image: ounishatem/docker-rpi-emu
 
 definitions:
   steps:
-    - step: &raspbian-setup
-      name: Raspbian Setup
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash raspbiansetup.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &install-camera
-      name: Install Camera
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash install_camera.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &install-distance
-      name: Install Distance
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash install_distance.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &install-fan
-      name: Install Fan
-      script:
-        - bash install_fan.sh
-      services:
-        - docker
-      caches:
-        - docker
-    - step: &install-link
-      name: Install Link
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
-        - export OLT_DISTANCE_DEVICE=`cat out/distance.txt`
-        - bash install_link.sh
-      services:
-        - docker
-      caches:
-        - docker
-    - step: &install-presence
-      name: Install Presence
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash install_presence.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &install-rgb
-      name: Install RGB
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash install_rgb.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &install-screen
-      name: Install Screen
-      script:
-        - export OLT_TOKEN="${OLT_TOKEN}"
-        - export OLT_TENANT="${OLT_TENANT}"
-        - bash install_screen.sh
-      services:
-        - docker
-      caches:
-        - docker
-      artifacts:
-        - out/**.txt
-    - step: &cleanup
-      name: Cleanup
-      script:
-        - export OLT_RASPBERRY_DEVICE=`cat out/raspberry.txt`
-        - export OLT_RASPBERRY_DEVICE_TYPE=`cat out/raspberry_type.txt`
-        - export OLT_CAMERA_DEVICE=`cat out/camera.txt`
-        - export OLT_CAMERA_DEVICE_TYPE=`cat out/camera_type.txt`
-        - export OLT_DISTANCE_DEVICE=`cat out/distance.txt`
-        - export OLT_DISTANCE_DEVICE_TYPE=`cat out/distance_type.txt`
-        - export OLT_PRESENCE_DEVICE=`cat out/presence.txt`
-        - export OLT_PRESENCE_DEVICE_TYPE=`cat out/presence_type.txt`
-        - export OLT_RGB_DEVICE=`cat out/rgb.txt`
-        - export OLT_RGB_DEVICE_TYPE=`cat out/rgb_type.txt`
-        - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
-        - export OLT_SCREEN_DEVICE_TYPE=`cat out/screen_type.txt`
-        - bash cleanup.sh
-      services:
-        - docker
-      caches:
-        - docker
+      - step: &raspbian-setup
+          name: Raspbian Setup
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash raspbiansetup.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &install-camera
+          name: Install Camera
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_camera.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &install-distance
+          name: Install Distance
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_distance.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &install-fan
+          name: Install Fan
+          script:
+            - bash install_fan.sh
+          services:
+            - docker
+          caches:
+            - docker
+      - step: &install-link
+          name: Install Link
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
+            - export OLT_DISTANCE_DEVICE=`cat out/distance.txt`
+            - bash install_link.sh
+          services:
+            - docker
+          caches:
+            - docker
+      - step: &install-presence
+          name: Install Presence
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_presence.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &install-rgb
+          name: Install RGB
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_rgb.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &install-screen
+          name: Install Screen
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_screen.sh
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - out/**.txt
+      - step: &cleanup
+          name: Cleanup
+          script:
+            - export OLT_RASPBERRY_DEVICE=`cat out/raspberry.txt`
+            - export OLT_RASPBERRY_DEVICE_TYPE=`cat out/raspberry_type.txt`
+            - export OLT_CAMERA_DEVICE=`cat out/camera.txt`
+            - export OLT_CAMERA_DEVICE_TYPE=`cat out/camera_type.txt`
+            - export OLT_DISTANCE_DEVICE=`cat out/distance.txt`
+            - export OLT_DISTANCE_DEVICE_TYPE=`cat out/distance_type.txt`
+            - export OLT_PRESENCE_DEVICE=`cat out/presence.txt`
+            - export OLT_PRESENCE_DEVICE_TYPE=`cat out/presence_type.txt`
+            - export OLT_RGB_DEVICE=`cat out/rgb.txt`
+            - export OLT_RGB_DEVICE_TYPE=`cat out/rgb_type.txt`
+            - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
+            - export OLT_SCREEN_DEVICE_TYPE=`cat out/screen_type.txt`
+            - bash cleanup.sh
+          services:
+            - docker
+          caches:
+            - docker
 
 pipelines:
   default:
