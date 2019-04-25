@@ -6,16 +6,24 @@ echo "Installing link program"
 [[ $- == *i* ]] && tput sgr0
 
 if [ -d /home/pi/link ]; then
-  rm -rf /home/pi/link
+  rm -rf /home/pi/link;
 fi
 mkdir -p /home/pi/link
 
-read -p "Provide your API Authentication-Token: " token
-read -p "Provide Distance Device Id: " distance
-read -p "Provide Screen Device Id: " screen
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
+if [ ! -n "$OLT_DISTANCE_DEVICE" ]; then
+  read -p "Provide Distance Device Id: " OLT_DISTANCE_DEVICE;
+fi
+
+if [ ! -n "$OLT_SCREEN_DEVICE" ]; then
+  read -p "Provide Screen Device Id: " OLT_SCREEN_DEVICE;
+fi
 
 cat << 'EOF' > /home/pi/link/link.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import requests
 import json
@@ -23,10 +31,10 @@ import json
 url = "https://api.dev.olt-dev.io/v1/devices/"
 EOF
 
-echo "jwt = \"Bearer $token\"" >> /home/pi/link/link.py
+echo "jwt = \"Bearer $OLT_TOKEN\"" >> /home/pi/link/link.py
 echo "contentType = \"application/json\""  >> /home/pi/link/link.py
-echo "distanceCensor = \"$distance\""  >> /home/pi/link/link.py
-echo "screen = \"$screen\""  >> /home/pi/link/link.py
+echo "distanceCensor = \"$OLT_DISTANCE_DEVICE\""  >> /home/pi/link/link.py
+echo "screen = \"$OLT_SCREEN_DEVICE\""  >> /home/pi/link/link.py
 
 cat << 'EOF' >> /home/pi/link/link.py
 try:
@@ -62,22 +70,25 @@ cat << 'EOF' > /home/pi/link/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[l]ink.py' | awk '{print $2}')
-/usr/bin/python /home/pi/link/link.py &
+/usr/bin/python3 /home/pi/link/link.py &
 
 EOF
 
 chmod +x /home/pi/link/cron.sh
 
-crontab -l > /tmp/crontabentry
-if ! grep -q "link/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/link/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/link/cron.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/link/cron.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
+if ! grep -q "link/cron.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/link/cron.sh\n" >> /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+
+crontab -l
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

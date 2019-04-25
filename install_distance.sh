@@ -22,23 +22,74 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_DISTANCE_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Distance_$dt\",
+  \"schema\": {
+    \"configuration\": {
+      \"distance\": {
+        \"type\": \"string\"
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_DISTANCE_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Distance_$dt\",
+    \"deviceTypeId\": \"$OLT_DISTANCE_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+
 if [ -d /home/pi/distance ]; then
-  rm -rf /home/pi/distance
+  rm -rf /home/pi/distance;
 fi
 mkdir -p /home/pi/distance
 
 openssl ecparam -out /home/pi/distance/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-openssl req -new -key /home/pi/distance/device_key.pem -x509 -days 365 -out /home/pi/distance/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -n "$OLT_TENANT" ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+if [ ! -n "$OLT_DISTANCE_DEVICE" ]; then
+  read -p "Provide your Device name: " OLT_DISTANCE_DEVICE;
+fi
+openssl req -new -key /home/pi/distance/device_key.pem -x509 -days 365 -out /home/pi/distance/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_DISTANCE_DEVICE'
+
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/distance/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/distance/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_DISTANCE_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/distance/distance.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import time
 import RPi.GPIO as GPIO
@@ -112,7 +163,7 @@ time.sleep(0.5)
 distance = 0
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"
 
@@ -146,7 +197,7 @@ EOF
 chmod +x /home/pi/distance/distance.py
 
 cat << 'EOF' > /home/pi/distance/simpledistance.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import time
 import RPi.GPIO as GPIO
@@ -190,7 +241,7 @@ GPIO.output(GPIO_TRIGGER, False)
 time.sleep(0.5)
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"
 
@@ -218,35 +269,29 @@ cat << 'EOF' > /home/pi/distance/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[d]istance.py' | awk '{print $2}')
-/usr/bin/python /home/pi/distance/distance.py &
+/usr/bin/python3 /home/pi/distance/distance.py &
 
 EOF
 
 chmod +x /home/pi/distance/cron.sh
 
-crontab -l > /tmp/crontabentry
-if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/distance/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/distance/cron.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" > /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
+crontab -l
 
-echo """
-Please Make sure your Device type has a structure similar to this one
-
-{
-  \"configuration\": {
-    \"distance\": {
-      \"type\": \"string\"
-    }
-}
-
-"""
+mkdir -p out
+echo $OLT_DISTANCE_DEVICE_TYPE > out/distance_type.txt
+echo $OLT_DISTANCE_DEVICE > out/distance.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

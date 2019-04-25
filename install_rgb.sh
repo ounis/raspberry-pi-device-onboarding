@@ -21,24 +21,84 @@ GPIO mapping:
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_RGB_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Rgb_$dt\",
+  \"schema\": {
+    \"actions\": {
+      \"ambientLight\": {
+        \"type\": \"object\",
+        \"properties\": {
+          \"b\": {
+            \"type\": \"string\"
+          },
+          \"g\": {
+            \"type\": \"string\"
+          },
+          \"r\": {
+            \"type\": \"string\"
+          }
+        }
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_RGB_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Rgb_$dt\",
+    \"deviceTypeId\": \"$OLT_RGB_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
 if [ -d /home/pi/rgb ]; then
-  rm -rf /home/pi/rgb
+  rm -rf /home/pi/rgb;
 fi
 mkdir -p /home/pi/rgb
 
 openssl ecparam -out /home/pi/rgb/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-read -p "Provide your Device  Id: " deviceId
-openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/rgb/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -n "$OLT_TENANT" ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+if [ ! -n "$OLT_RGB_DEVICE" ]; then
+  read -p "Provide your Device name: " OLT_RGB_DEVICE;
+fi
+openssl req -new -key /home/pi/rgb/device_key.pem -x509 -days 365 -out /home/pi/rgb/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RGB_DEVICE'
+
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/rgb/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/rgb/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RGB_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/rgb/rgb.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import RPi.GPIO as GPIO
 import json
@@ -60,13 +120,13 @@ GPIO.setup(BLUE, GPIO.OUT)
 GPIO.output(BLUE, 0)
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/rgb/device_cert.pem"
 private = "/home/pi/rgb/device_key.pem"
 
 EOF
 
-echo "deviceId = \"$deviceId\"" >> /home/pi/rgb/rgb.py
+echo "deviceId = \"$OLT_RGB_DEVICE\"" >> /home/pi/rgb/rgb.py
 
 cat << 'EOF' >> /home/pi/rgb/rgb.py
 
@@ -109,46 +169,29 @@ cat << 'EOF' > /home/pi/rgb/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[r]gb.py' | awk '{print $2}')
-/usr/bin/python /home/pi/rgb/rgb.py &
+/usr/bin/python3 /home/pi/rgb/rgb.py &
 
 EOF
 
 chmod +x /home/pi/rgb/cron.sh
 
-crontab -l > /tmp/crontabentry
-if ! grep -q "rgb/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/rgb/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/rgb/cron.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/rgb/cron.sh\n" > /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if ! grep -q "rgb/cron.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/rgb/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
-echo """
-Please Make sure your Device type has a structure similar to this one
+crontab -l
 
-{
-  \"actions\": {
-    \"ambientLight\": {
-      \"type\": \"object\",
-      \"properties\": {
-        \"b\": {
-          \"type\": \"string\"
-        },
-        \"g\": {
-          \"type\": \"string\"
-        },
-        \"r\": {
-          \"type\": \"string\"
-        }
-      }
-    }
-  }
-}
-
-"""
+mkdir -p out
+echo $OLT_RGB_DEVICE_TYPE > out/rgb_type.txt
+echo $OLT_RGB_DEVICE > out/rgb.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

@@ -7,7 +7,7 @@ echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
-sudo apt-key add mosquitto-repo.gpg.key
+apt-key add mosquitto-repo.gpg.key
 cd /etc/apt/sources.list.d/
 sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
 sudo apt-get update -y
@@ -22,32 +22,77 @@ sudo apt-get install -y python-pip
 sudo apt-get install -y python-requests
 sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
+sudo pip install RPi.GPIO
+
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"RaspberryPi_$dt\",
+  \"schema\": {
+    \"configuration\": {
+      \"ipaddress\": {
+        \"type\": \"string\"
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_RASPBERRY_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"RaspberryPi_$dt\",
+    \"deviceTypeId\": \"$OLT_RASPBERRY_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Generate certificate & key"
 [[ $- == *i* ]] && tput sgr0
 if [ -d /home/pi/raspberrypi ]; then
-  rm -rf /home/pi/raspberrypi
+  rm -rf /home/pi/raspberrypi;
+fi
+mkdir /home/pi/raspberrypi
+openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
+if [ ! -n "$OLT_TENANT" ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
 fi
 
-mkdir /home/pi/raspberrypi
-# Genereate enough entropy inside the container to generate the ssl key
-{while [ ! -d /home/pi/raspberrypi/device_key.pem ] do
-  find / > /dev/null 2>&1
-done} &
-openssl ecparam -out /home/pi/raspberrypi/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name: " tenant
-read -p "Provide your Device name: " device
-openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -n "$OLT_RASPBERRY_DEVICE" ]; then
+  read -p "Provide your Device name: " OLT_RASPBERRY_DEVICE;
+fi
+openssl req -new -key /home/pi/raspberrypi/device_key.pem -x509 -days 365 -out /home/pi/raspberrypi/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_RASPBERRY_DEVICE'
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/raspberrypi/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
+
 [[ $- == *i* ]] && tput setaf 2
-echo "Please copy and paste it in your device certificate section in OLT platform"
-
-
 echo "Save OLT certificate"
 [[ $- == *i* ]] && tput sgr0
 
@@ -69,12 +114,19 @@ EOF
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Prepare to send ip address to your device in OLT platform"
-echo "Make sure your device has in the configuration a String entry called ipaddress"
 [[ $- == *i* ]] && tput sgr0
 cat << 'EOF' > /home/pi/raspberrypi/ipmqtt.sh
 #!/bin/bash
 
-ip=`/sbin/ifconfig wlan0 | grep 'inet ' | awk '{print $2}'`
+EOF
+
+if [ ! -n "$NETWORK_INTERFACE" ]; then
+  read -p "Provide Device network interface (eth0, wlan0, etc...): " NETWORK_INTERFACE;
+fi
+
+echo "ip=\`/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print \$2}'\`" >> /home/pi/raspberrypi/ipmqtt.sh
+
+cat << 'EOF' >> /home/pi/raspberrypi/ipmqtt.sh
 
 msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s" } }' "$ip")
 
@@ -92,29 +144,34 @@ EOF
 
 chmod +x /home/pi/raspberrypi/ipmqtt.sh
 
-crontab -l > /tmp/crontabentry
-if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/raspberrypi/ipmqtt.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" > /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if ! grep -q "raspberrypi/ipmqtt.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/raspberrypi/ipmqtt.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
-echo """
-Please Make sure your Device type has a structure similar to this one
+crontab -l
 
-{
-  \"configuration\": {
-    \"ipaddress\": {
-      \"type\": \"string\"
-    }
-  }
-}
+/home/pi/raspberrypi/ipmqtt.sh
 
-"""
+sleep 5
+
+IP_ADDRESS=`curl -X GET \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/state" \
+  -H "Authorization: Bearer $OLT_TOKEN" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['configuration']['ipaddress'])"`
+
+diff <(echo "$IP_ADDRESS" ) <(echo `/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}'`)
+
+mkdir -p out
+echo $OLT_RASPBERRY_DEVICE_TYPE > out/raspberry_type.txt
+echo $OLT_RASPBERRY_DEVICE > out/raspberry.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0

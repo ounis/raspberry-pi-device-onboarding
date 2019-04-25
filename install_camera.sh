@@ -11,23 +11,83 @@ Please don't forget to enable the camera in your raspi-config
 """
 [[ $- == *i* ]] && tput sgr0
 
+[[ $- == *i* ]] && tput setaf 2
+echo "Install picamera"
+[[ $- == *i* ]] && tput sgr0
+
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device type"
+[[ $- == *i* ]] && tput sgr0
+dt=`date +%s`
+OLT_CAMERA_DEVICE_TYPE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/device-types \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"name\": \"Camera_$dt\",
+  \"schema\": {
+    \"configuration\": {
+      \"hash\": {
+        \"type\": \"string\"
+      },
+      \"chunk\": {
+        \"type\": \"integer\"
+      },
+      \"video\": {
+        \"type\": \"string\"
+      }
+    }
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Create device"
+[[ $- == *i* ]] && tput sgr0
+OLT_CAMERA_DEVICE=`curl -X POST \
+  https://api.dev.olt-dev.io/v1/devices \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"info\": {
+    \"name\": \"Camera_$dt\",
+    \"deviceTypeId\": \"$OLT_CAMERA_DEVICE_TYPE\"
+  }
+}" | \
+python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
+
 if [ -d /home/pi/camera ]; then
-  rm -rf /home/pi/camera
+  rm -rf /home/pi/camera;
 fi
 mkdir -p /home/pi/camera
 
 openssl ecparam -out /home/pi/camera/device_key.pem -name prime256v1 -genkey
-read -p "Provide your Tenant name (or Id): " tenant
-read -p "Provide your Device name (or Id): " device
-openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$tenant/CN=$device'
+if [ ! -n "$OLT_TENANT" ]; then
+  read -p "Provide your Tenant name: " OLT_TENANT;
+fi
 
-[[ $- == *i* ]] && tput setaf 2
-echo "Add this certificate to your device"
+if [ ! -n "$OLT_CAMERA_DEVICE" ]; then
+  read -p "Provide your Device name: " OLT_CAMERA_DEVICE;
+fi
+openssl req -new -key /home/pi/camera/device_key.pem -x509 -days 365 -out /home/pi/camera/device_cert.pem -subj '/O=$OLT_TENANT/CN=$OLT_CAMERA_DEVICE'
+
+echo "Your device certificate is:"
 [[ $- == *i* ]] && tput sgr0
-cat /home/pi/camera/device_cert.pem
+OLT_DEVICE_CERTIFICATE=$(</home/pi/camera/device_cert.pem)
+OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
+
+curl -X POST \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE/certificates" \
+  -H "Authorization: Bearer $OLT_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/camera/camera.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ssl
 import paho.mqtt.client as mqtt
@@ -81,7 +141,7 @@ os.remove(txtFilename)
 # Iterate on chunks and send a message for each one
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/camera/device_cert.pem"
 private = "/home/pi/camera/device_key.pem"
 
@@ -118,40 +178,29 @@ cat << 'EOF' > /home/pi/camera/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[c]amera.py' | awk '{print $2}')
-/usr/bin/python /home/pi/camera/camera.py &
+/usr/bin/python3 /home/pi/camera/camera.py &
 
 EOF
 
 chmod +x /home/pi/camera/cron.sh
 
-crontab -l > /tmp/crontabentry
-if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/camera/cron.sh' >> /tmp/crontabentry
-  crontab /tmp/crontabentry
-fi
+crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo '* * * * * /home/pi/camera/cron.sh' > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" > /tmp/crontabentry
+  crontab /tmp/crontabentry
+fi
+if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
+  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
-echo """
-Please Make sure your Device type has a structure similar to this one
+crontab -l
 
-{
-  \"configuration\": {
-    \"hash\": {
-      \"type\": \"string\"
-    },
-    \"chunk\": {
-      \"type\": \"integer\"
-    },
-    \"video\": {
-      \"type\": \"string\"
-    }
-  }
-}
-"""
+mkdir -p out
+echo $OLT_CAMERA_DEVICE_TYPE > out/camera_type.txt
+echo $OLT_CAMERA_DEVICE > out/camera.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
 [[ $- == *i* ]] && tput sgr0
+exit 0
