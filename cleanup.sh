@@ -93,6 +93,24 @@ CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
 diff <(echo "$CODE" ) <(echo "204")
 
 [[ $- == *i* ]] && tput setaf 2
+echo "Delete Hue"
+[[ $- == *i* ]] && tput sgr0
+
+CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+  "https://api.dev.olt-dev.io/v1/devices/$OLT_HUE_DEVICE" \
+  -H "Authorization: Bearer $OLT_TOKEN")"
+diff <(echo "$CODE" ) <(echo "204")
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Hue Type"
+[[ $- == *i* ]] && tput sgr0
+
+CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+  "https://api.dev.olt-dev.io/v1/device-types/$OLT_HUE_DEVICE_TYPE" \
+  -H "Authorization: Bearer $OLT_TOKEN")"
+diff <(echo "$CODE" ) <(echo "204")
+
+[[ $- == *i* ]] && tput setaf 2
 echo "Delete Raspberry"
 [[ $- == *i* ]] && tput sgr0
 

@@ -24,6 +24,10 @@ sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
 sudo pip install RPi.GPIO
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0

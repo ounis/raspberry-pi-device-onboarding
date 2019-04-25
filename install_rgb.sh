@@ -21,6 +21,10 @@ GPIO mapping:
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
@@ -94,7 +98,7 @@ curl -X POST \
   -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/rgb/rgb.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import RPi.GPIO as GPIO
 import json
@@ -116,7 +120,7 @@ GPIO.setup(BLUE, GPIO.OUT)
 GPIO.output(BLUE, 0)
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/rgb/device_cert.pem"
 private = "/home/pi/rgb/device_key.pem"
 
@@ -165,7 +169,7 @@ cat << 'EOF' > /home/pi/rgb/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[r]gb.py' | awk '{print $2}')
-/usr/bin/python /home/pi/rgb/rgb.py &
+/usr/bin/python3 /home/pi/rgb/rgb.py &
 
 EOF
 
@@ -173,11 +177,11 @@ chmod +x /home/pi/rgb/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/rgb/rgb.py\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/rgb/cron.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "rgb/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/rgb/rgb.py\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/rgb/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

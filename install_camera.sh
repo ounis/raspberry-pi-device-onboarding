@@ -15,6 +15,10 @@ Please don't forget to enable the camera in your raspi-config
 echo "Install picamera"
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
@@ -83,7 +87,7 @@ curl -X POST \
   -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/camera/camera.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ssl
 import paho.mqtt.client as mqtt
@@ -137,7 +141,7 @@ os.remove(txtFilename)
 # Iterate on chunks and send a message for each one
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/camera/device_cert.pem"
 private = "/home/pi/camera/device_key.pem"
 
@@ -174,7 +178,7 @@ cat << 'EOF' > /home/pi/camera/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[c]amera.py' | awk '{print $2}')
-/usr/bin/python /home/pi/camera/camera.py &
+/usr/bin/python3 /home/pi/camera/camera.py &
 
 EOF
 
@@ -182,11 +186,11 @@ chmod +x /home/pi/camera/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/camera.py\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/camera.py\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

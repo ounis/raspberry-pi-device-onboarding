@@ -22,6 +22,10 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
@@ -85,7 +89,7 @@ curl -X POST \
   -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/distance/distance.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import time
 import RPi.GPIO as GPIO
@@ -159,7 +163,7 @@ time.sleep(0.5)
 distance = 0
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"
 
@@ -193,7 +197,7 @@ EOF
 chmod +x /home/pi/distance/distance.py
 
 cat << 'EOF' > /home/pi/distance/simpledistance.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import time
 import RPi.GPIO as GPIO
@@ -237,7 +241,7 @@ GPIO.output(GPIO_TRIGGER, False)
 time.sleep(0.5)
 
 url = "mqtt.dev.olt-dev.io"
-ca = "/home/pi/raspberrypi/olt_ca.pem" 
+ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"
 
@@ -265,7 +269,7 @@ cat << 'EOF' > /home/pi/distance/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[d]istance.py' | awk '{print $2}')
-/usr/bin/python /home/pi/distance/distance.py &
+/usr/bin/python3 /home/pi/distance/distance.py &
 
 EOF
 
@@ -273,11 +277,11 @@ chmod +x /home/pi/distance/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/distance/distance.py\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/distance/distance.py\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

@@ -67,6 +67,15 @@ definitions:
           artifacts:
             - out/screen.txt
             - out/screen_type.txt
+      - step: &install-hue
+          name: Install Hue
+          script:
+            - export OLT_TOKEN="${OLT_TOKEN}"
+            - export OLT_TENANT="${OLT_TENANT}"
+            - bash install_hue.sh
+          artifacts:
+            - out/hue.txt
+            - out/hue_type.txt
       - step: &cleanup
           name: Cleanup
           script:
@@ -82,6 +91,8 @@ definitions:
             - export OLT_RGB_DEVICE_TYPE=`cat out/rgb_type.txt`
             - export OLT_SCREEN_DEVICE=`cat out/screen.txt`
             - export OLT_SCREEN_DEVICE_TYPE=`cat out/screen_type.txt`
+            - export OLT_HUE_DEVICE=`cat out/hue.txt`
+            - export OLT_HUE_DEVICE_TYPE=`cat out/hue_type.txt`
             - bash cleanup.sh
 
 pipelines:
@@ -94,5 +105,6 @@ pipelines:
       - step: *install-presence
       - step: *install-rgb
       - step: *install-screen
+      - step: *install-hue
     - step: *install-link
     - step: *cleanup

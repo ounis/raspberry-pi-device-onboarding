@@ -20,6 +20,10 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_TOKEN" ]; then
+  read -p "Provide your API Authentication-Token: " OLT_TOKEN;
+fi
+
 [[ $- == *i* ]] && tput setaf 2
 echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
@@ -82,7 +86,7 @@ curl -X POST \
   -d "$OLT_DEVICE_CERTIFICATE"
 
 cat << 'EOF' > /home/pi/presence/presence.py
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import time
 import RPi.GPIO as GPIO
@@ -121,7 +125,7 @@ cat << 'EOF' > /home/pi/presence/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[p]resence.py' | awk '{print $2}')
-/usr/bin/python /home/pi/presence/presence.py &
+/usr/bin/python3 /home/pi/presence/presence.py &
 
 EOF
 
@@ -129,11 +133,11 @@ chmod +x /home/pi/presence/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/presence/presence.py\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/presence/cron.sh\n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "presence/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/presence/presence.py\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/presence/cron.sh\n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
