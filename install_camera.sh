@@ -15,6 +15,10 @@ Please don't forget to enable the camera in your raspi-config
 echo "Install picamera"
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_PLATFORM" ]; then
+  read -p "Provide your platform URL: " OLT_PLATFORM;
+fi
+
 if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
@@ -24,7 +28,7 @@ echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
 dt=`date +%s`
 OLT_CAMERA_DEVICE_TYPE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/device-types \
+  https://api.$OLT_PLATFORM/v1/device-types \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -49,7 +53,7 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 echo "Create device"
 [[ $- == *i* ]] && tput sgr0
 OLT_CAMERA_DEVICE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/devices \
+  https://api.$OLT_PLATFORM/v1/devices \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -81,7 +85,7 @@ OLT_DEVICE_CERTIFICATE=$(</home/pi/camera/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
 curl -X POST \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_CAMERA_DEVICE/certificates" \
+  "https://api.$OLT_PLATFORM/v1/devices/$OLT_CAMERA_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "$OLT_DEVICE_CERTIFICATE"
@@ -102,6 +106,12 @@ import urllib
 
 vidFilename = '/home/pi/camera/video.h264'
 txtFilename = '/home/pi/camera/video.txt'
+
+EOF
+
+echo "olt_platform=$OLT_PLATFORM" >> /home/pi/camera/camera.py
+
+cat << 'EOF' >> /home/pi/camera/camera.py
 
 # Record a 30 seconds video
 with PiCamera() as camera:
@@ -140,7 +150,7 @@ os.remove(txtFilename)
 
 # Iterate on chunks and send a message for each one
 
-url = "mqtt.dev.olt-dev.io"
+url = "mqtt." + olt_platform
 ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/camera/device_cert.pem"
 private = "/home/pi/camera/device_key.pem"

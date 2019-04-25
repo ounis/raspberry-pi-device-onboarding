@@ -22,6 +22,10 @@ GPIO mapping
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_PLATFORM" ]; then
+  read -p "Provide your platform URL: " OLT_PLATFORM;
+fi
+
 if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
@@ -31,7 +35,7 @@ echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
 dt=`date +%s`
 OLT_DISTANCE_DEVICE_TYPE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/device-types \
+  https://api.$OLT_PLATFORM/v1/device-types \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -50,7 +54,7 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 echo "Create device"
 [[ $- == *i* ]] && tput sgr0
 OLT_DISTANCE_DEVICE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/devices \
+  https://api.$OLT_PLATFORM/v1/devices \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -83,7 +87,7 @@ OLT_DEVICE_CERTIFICATE=$(</home/pi/distance/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
 curl -X POST \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_DISTANCE_DEVICE/certificates" \
+  "https://api.$OLT_PLATFORM/v1/devices/$OLT_DISTANCE_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "$OLT_DEVICE_CERTIFICATE"
@@ -162,7 +166,12 @@ time.sleep(0.5)
 
 distance = 0
 
-url = "mqtt.dev.olt-dev.io"
+EOF
+
+echo "url=\"mqtt.$OLT_PLATFORM\"" >> /home/pi/distance/distance.py
+
+cat << 'EOF' >> /home/pi/distance/distance.py
+
 ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"
@@ -240,7 +249,12 @@ GPIO.output(GPIO_TRIGGER, False)
 
 time.sleep(0.5)
 
-url = "mqtt.dev.olt-dev.io"
+EOF
+
+echo "url=\"mqtt.$OLT_PLATFORM\"" >> /home/pi/distance/simpledistance.py
+
+cat << 'EOF' >> /home/pi/distance/simpledistance.py
+
 ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/distance/device_cert.pem"
 private = "/home/pi/distance/device_key.pem"

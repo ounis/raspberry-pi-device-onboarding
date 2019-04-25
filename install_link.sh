@@ -10,6 +10,10 @@ if [ -d /home/pi/link ]; then
 fi
 mkdir -p /home/pi/link
 
+if [ ! -n "$OLT_PLATFORM" ]; then
+  read -p "Provide your platform URL: " OLT_PLATFORM;
+fi
+
 if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
@@ -28,9 +32,10 @@ cat << 'EOF' > /home/pi/link/link.py
 import requests
 import json
 
-url = "https://api.dev.olt-dev.io/v1/devices/"
+
 EOF
 
+echo "url=\"https://api.$OLT_PLATFORM/v1/devices/\"" >> /home/pi/link/link.py
 echo "jwt = \"Bearer $OLT_TOKEN\"" >> /home/pi/link/link.py
 echo "contentType = \"application/json\""  >> /home/pi/link/link.py
 echo "distanceCensor = \"$OLT_DISTANCE_DEVICE\""  >> /home/pi/link/link.py

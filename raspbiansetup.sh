@@ -24,6 +24,10 @@ sudo pip3 install paho-mqtt
 sudo pip install paho-mqtt
 sudo pip install RPi.GPIO
 
+if [ ! -n "$OLT_PLATFORM" ]; then
+  read -p "Provide your platform URL: " OLT_PLATFORM;
+fi
+
 if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
@@ -33,7 +37,7 @@ echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
 dt=`date +%s`
 OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/device-types \
+  https://api.$OLT_PLATFORM/v1/device-types \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -52,7 +56,7 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 echo "Create device"
 [[ $- == *i* ]] && tput sgr0
 OLT_RASPBERRY_DEVICE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/devices \
+  https://api.$OLT_PLATFORM/v1/devices \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -87,7 +91,7 @@ OLT_DEVICE_CERTIFICATE=$(</home/pi/raspberrypi/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
 curl -X POST \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
+  "https://api.$OLT_PLATFORM/v1/devices/$OLT_RASPBERRY_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "$OLT_DEVICE_CERTIFICATE"
@@ -130,7 +134,13 @@ cat << 'EOF' >> /home/pi/raspberrypi/ipmqtt.sh
 
 msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s" } }' "$ip")
 
-/usr/bin/mosquitto_pub -h mqtt.dev.olt-dev.io \
+EOF
+
+echo "url=\"mqtt.$OLT_PLATFORM\"" >> /home/pi/raspberrypi/ipmqtt.sh
+
+cat << 'EOF' >> /home/pi/raspberrypi/ipmqtt.sh
+
+/usr/bin/mosquitto_pub -h "$url" \
 -p 8883 \
 --cafile /home/pi/raspberrypi/olt_ca.pem \
 --cert /home/pi/raspberrypi/device_cert.pem \
@@ -161,7 +171,7 @@ crontab -l
 sleep 5
 
 IP_ADDRESS=`curl -X GET \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_RASPBERRY_DEVICE/state" \
+  "https://api.$OLT_PLATFORM/v1/devices/$OLT_RASPBERRY_DEVICE/state" \
   -H "Authorization: Bearer $OLT_TOKEN" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['configuration']['ipaddress'])"`
 

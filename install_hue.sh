@@ -9,6 +9,10 @@ A Philips Hue gateway was used with several Hue lightbulbs
 """
 [[ $- == *i* ]] && tput sgr0
 
+if [ ! -n "$OLT_PLATFORM" ]; then
+  read -p "Provide your platform URL: " OLT_PLATFORM;
+fi
+
 if [ ! -n "$OLT_TOKEN" ]; then
   read -p "Provide your API Authentication-Token: " OLT_TOKEN;
 fi
@@ -18,7 +22,7 @@ echo "Create device type"
 [[ $- == *i* ]] && tput sgr0
 dt=`date +%s`
 OLT_HUE_DEVICE_TYPE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/device-types \
+  https://api.$OLT_PLATFORM/v1/device-types \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -42,7 +46,7 @@ python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 echo "Create device"
 [[ $- == *i* ]] && tput sgr0
 OLT_HUE_DEVICE=`curl -X POST \
-  https://api.dev.olt-dev.io/v1/devices \
+  https://api.$OLT_PLATFORM/v1/devices \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{
@@ -74,7 +78,7 @@ OLT_DEVICE_CERTIFICATE=$(</home/pi/hue/device_cert.pem)
 OLT_DEVICE_CERTIFICATE="{\"cert\": \"${OLT_DEVICE_CERTIFICATE//$'\n'/\\\n}\", \"status\":\"valid\"}"
 
 curl -X POST \
-  "https://api.dev.olt-dev.io/v1/devices/$OLT_HUE_DEVICE/certificates" \
+  "https://api.$OLT_PLATFORM/v1/devices/$OLT_HUE_DEVICE/certificates" \
   -H "Authorization: Bearer $OLT_TOKEN" \
   -H 'Content-Type: application/json' \
   -d "$OLT_DEVICE_CERTIFICATE"
@@ -177,7 +181,12 @@ def on_message(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
     mqttc.subscribe("devices/" + deviceId + "/actions")
 
-url = "mqtt.dev.olt-dev.io"
+EOF
+
+echo "url=\"mqtt.$OLT_PLATFORM\"" >> /home/pi/hue/hue.py
+
+cat << 'EOF' >> /home/pi/hue/hue.py
+
 ca = "/home/pi/raspberrypi/olt_ca.pem"
 cert = "/home/pi/hue/device_cert.pem"
 private = "/home/pi/hue/device_key.pem"
