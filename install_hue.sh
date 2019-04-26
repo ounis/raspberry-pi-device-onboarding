@@ -110,21 +110,46 @@ echo "hue_user = \"$OLT_HUE_USER\"" >> /home/pi/hue/hue.py
 
 cat << 'EOF' >> /home/pi/hue/hue.py
 
-lamp1 = "1"
-lamp2 = "2"
-lamp3 = "3"
-lamp4 = "4"
-lamp5 = "5"
-lamp6 = "6"
+lamp1 = "25"
 
 red = """{
-    "hue": 65000,
+    "hue": 65535,
     "sat": 254,
     "transitiontime": 0
 }"""
 
 yellow = """{
     "hue": 10000,
+    "sat": 254,
+    "transitiontime": 0
+}"""
+
+green = """{
+    "hue": 21845,
+    "sat": 254,
+    "transitiontime": 0
+}"""
+
+cyan = """{
+    "hue": 40000,
+    "sat": 254,
+    "transitiontime": 0
+}"""
+
+blue = """{
+    "hue": 45000,
+    "sat": 254,
+    "transitiontime": 0
+}"""
+
+purple = """{
+    "hue": 45500,
+    "sat": 254,
+    "transitiontime": 0
+}"""
+
+orange = """{
+    "hue": 8000,
     "sat": 254,
     "transitiontime": 0
 }"""
@@ -138,24 +163,21 @@ white = """{
 }"""
 
 
+off = """{
+    "on": false,
+    "transitiontime": 0
+}"""
+
+
 def update_state(url, payload):
-    requests.put(url,
+    result = requests.put(url,
         verify=False,
         headers={"content-type":"application/json"},
         data=payload)
+    print(result.text)
 
 def set_color(color):
     url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp1 + "/state"
-    update_state(url, color)
-    url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp2 + "/state"
-    update_state(url, color)
-    url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp3 + "/state"
-    update_state(url, color)
-    url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp4 + "/state"
-    update_state(url, color)
-    url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp5 + "/state"
-    update_state(url, color)
-    url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp6 + "/state"
     update_state(url, color)
 
 EOF
@@ -169,14 +191,9 @@ def on_message(client, userdata, message):
     parsed_json = json.loads(msg.decode("utf-8"))
     alert = parsed_json["payload"]["alert"]
     if alert == "error":
-        # Blink for 10 seconds
-        timeout = time.time() + 10
-        while True:
-            if time.time() > timeout:
-                break
-            set_color(white)
-            set_color(red)
-    set_color(yellow)
+        set_color(red)
+    if alert == "success":
+        set_color(green)
 
 def on_connect(client, userdata, flags, rc):
     mqttc.subscribe("devices/" + deviceId + "/actions")
@@ -201,7 +218,6 @@ ssl_context.load_cert_chain(certfile=cert, keyfile=private)
 mqttc.tls_set_context(context=ssl_context)
 mqttc.connect(url, port=8883)
 
-set_color(yellow)
 try:
     while True:
         mqttc.loop_forever()
