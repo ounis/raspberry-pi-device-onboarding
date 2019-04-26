@@ -170,11 +170,10 @@ off = """{
 
 
 def update_state(url, payload):
-    result = requests.put(url,
+     requests.put(url,
         verify=False,
         headers={"content-type":"application/json"},
         data=payload)
-    print(result.text)
 
 def set_color(color):
     url = "https://" + hue_address + "/api/" + hue_user + "/lights/" + lamp1 + "/state"
