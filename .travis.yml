@@ -6,5 +6,5 @@ before_install:
 
 
 script:
-  - docker run -d -name docker-rpi-emu ounishatem/docker-rpi-emu /bin/bash -c './run.sh'
+  - docker run -d -P --name docker-rpi-emu -v "$TRAVIS_BUILD_DIR":/home/pi ounishatem/docker-rpi-emu /bin/bash -c './run.sh'
   - docker logs -f docker-rpi-emu
