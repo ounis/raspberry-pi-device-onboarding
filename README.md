@@ -1,6 +1,6 @@
 LICENSE
 =======
-This code is distributed under the MIT License. See the file LICENSE for details.
+This code is distributed under the GPL v2 License. See the file LICENSE for details.
 
 I copied some parts of the code from many online tutorials, if any license issue is found please contact the maintainer to resolve those issues.
 
