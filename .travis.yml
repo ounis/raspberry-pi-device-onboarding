@@ -21,4 +21,3 @@ script:
     -v "$TRAVIS_BUILD_DIR":/home/pi
     ounishatem/docker-rpi-emu
   - docker exec -it docker-rpi-emu bash /home/pi/run.sh
-  - docker logs -f docker-rpi-emu
