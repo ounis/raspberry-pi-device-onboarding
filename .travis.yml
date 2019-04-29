@@ -6,7 +6,19 @@ before_install:
 
 
 script:
-  - docker run --entrypoint "/bin/sh"  -it -d -P --name docker-rpi-emu -v "$TRAVIS_BUILD_DIR":/home/pi ounishatem/docker-rpi-emu
-  - docker exec -it docker-rpi-emu chmod +x /home/pi/*.sh
-  - docker exec -it docker-rpi-emu /home/pi/run.sh
+  - docker run
+    --entrypoint "/bin/sh"
+    -it
+    -d
+    -P
+    -e OLT_PLATFORM="$OLT_PLATFORM"
+    -e OLT_TENANT="$OLT_TENANT"
+    -e OLT_TOKEN="$OLT_TOKEN"
+    -e NETWORK_INTERFACE="$NETWORK_INTERFACE"
+    -e OLT_HUE_ADDRESS="$OLT_HUE_ADDRESS"
+    -e OLT_HUE_USER="$OLT_HUE_USER"
+    --name docker-rpi-emu
+    -v "$TRAVIS_BUILD_DIR":/home/pi
+    ounishatem/docker-rpi-emu
+  - docker exec -it docker-rpi-emu bash /home/pi/run.sh
   - docker logs -f docker-rpi-emu
