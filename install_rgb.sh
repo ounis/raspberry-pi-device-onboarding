@@ -197,9 +197,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_RGB_DEVICE_TYPE > out/rgb_type.txt
-echo $OLT_RGB_DEVICE > out/rgb.txt
+mkdir -p /home/pi/out
+echo $OLT_RGB_DEVICE_TYPE > /home/pi/out/rgb_type.txt
+echo $OLT_RGB_DEVICE > /home/pi/out/rgb.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

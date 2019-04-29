@@ -206,9 +206,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_CAMERA_DEVICE_TYPE > out/camera_type.txt
-echo $OLT_CAMERA_DEVICE > out/camera.txt
+mkdir -p /home/pi/out
+echo $OLT_CAMERA_DEVICE_TYPE > /home/pi/out/camera_type.txt
+echo $OLT_CAMERA_DEVICE > /home/pi/out/camera.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

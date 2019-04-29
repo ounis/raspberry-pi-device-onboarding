@@ -301,9 +301,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_DISTANCE_DEVICE_TYPE > out/distance_type.txt
-echo $OLT_DISTANCE_DEVICE > out/distance.txt
+mkdir -p /home/pi/out
+echo $OLT_DISTANCE_DEVICE_TYPE > /home/pi/out/distance_type.txt
+echo $OLT_DISTANCE_DEVICE > /home/pi/out/distance.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

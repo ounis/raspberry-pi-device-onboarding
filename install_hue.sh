@@ -252,9 +252,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_HUE_DEVICE_TYPE > out/hue_type.txt
-echo $OLT_HUE_DEVICE > out/hue.txt
+mkdir -p /home/pi/out
+echo $OLT_HUE_DEVICE_TYPE > /home/pi/out/hue_type.txt
+echo $OLT_HUE_DEVICE > /home/pi/out/hue.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

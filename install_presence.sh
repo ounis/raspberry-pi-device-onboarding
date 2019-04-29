@@ -153,9 +153,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_PRESENCE_DEVICE_TYPE > out/presence_type.txt
-echo $OLT_PRESENCE_DEVICE > out/presence.txt
+mkdir -p /home/pi/out
+echo $OLT_PRESENCE_DEVICE_TYPE > /home/pi/out/presence_type.txt
+echo $OLT_PRESENCE_DEVICE > /home/pi/out/presence.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"

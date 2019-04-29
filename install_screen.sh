@@ -398,9 +398,9 @@ fi
 
 crontab -l
 
-mkdir -p out
-echo $OLT_SCREEN_DEVICE_TYPE > out/screen_type.txt
-echo $OLT_SCREEN_DEVICE > out/screen.txt
+mkdir -p /home/pi/out
+echo $OLT_SCREEN_DEVICE_TYPE > /home/pi/out/screen_type.txt
+echo $OLT_SCREEN_DEVICE > /home/pi/out/screen.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
