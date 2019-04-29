@@ -6,4 +6,5 @@ before_install:
 
 
 script:
-  - docker run ounishatem/docker-rpi-emu /bin/bash -c './run.sh'
+  - docker run -d -name docker-rpi-emu ounishatem/docker-rpi-emu /bin/bash -c './run.sh'
+  - docker logs -f docker-rpi-emu
