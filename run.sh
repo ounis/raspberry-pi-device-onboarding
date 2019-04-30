@@ -32,4 +32,6 @@ export OLT_HUE_DEVICE_TYPE=`cat /home/pi/out/hue_type.txt`
 
 bash /home/pi/install_link.sh
 
+bash /home/pi/install_fan.sh
+
 bash /home/pi/cleanup.sh
