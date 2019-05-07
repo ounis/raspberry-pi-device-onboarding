@@ -7,7 +7,7 @@ echo "Install Mosqitto"
 [[ $- == *i* ]] && tput sgr0
 cd /tmp
 sudo wget https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
-apt-key add mosquitto-repo.gpg.key
+sudo apt-key add mosquitto-repo.gpg.key
 cd /etc/apt/sources.list.d/
 sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
 sudo apt-get update -y
@@ -45,6 +45,9 @@ OLT_RASPBERRY_DEVICE_TYPE=`curl -X POST \
   \"schema\": {
     \"configuration\": {
       \"ipaddress\": {
+        \"type\": \"string\"
+      },
+      \"temperature\": {
         \"type\": \"string\"
       }
     }
@@ -132,7 +135,13 @@ echo "ip=\`/sbin/ifconfig $NETWORK_INTERFACE | grep 'inet ' | awk '{print \$2}'\
 
 cat << 'EOF' >> /home/pi/raspberrypi/ipmqtt.sh
 
-msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s" } }' "$ip")
+reading=`vcgencmd measure_temp`
+prefix="temp="
+suffix="'C"
+reading="${reading#"$prefix"}"
+temperature="${reading%"$suffix"}"
+
+msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s", "temperature": "%s"} }' "$ip", "$temperature")
 
 EOF
 

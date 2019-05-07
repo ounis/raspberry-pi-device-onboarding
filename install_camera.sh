@@ -109,7 +109,7 @@ txtFilename = '/home/pi/camera/video.txt'
 
 EOF
 
-echo "olt_platform=$OLT_PLATFORM" >> /home/pi/camera/camera.py
+echo "olt_platform=\"$OLT_PLATFORM\"" >> /home/pi/camera/camera.py
 
 cat << 'EOF' >> /home/pi/camera/camera.py
 
