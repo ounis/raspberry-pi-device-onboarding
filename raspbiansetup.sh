@@ -141,7 +141,7 @@ suffix="'C"
 reading="${reading#"$prefix"}"
 temperature="${reading%"$suffix"}"
 
-msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s", "temperature": "%s"} }' "$ip", "$temperature")
+msg=$(printf '{ "type": "configuration", "value": { "ipaddress": "%s", "temperature": "%s"} }' "$ip" "$temperature")
 
 EOF
 
