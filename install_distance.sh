@@ -283,7 +283,7 @@ cat << 'EOF' > /home/pi/distance/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[d]istance.py' | awk '{print $2}')
-/usr/bin/python3 /home/pi/distance/distance.py &
+/usr/bin/python3 /home/pi/distance/distance.py > /home/pi/iot.log 2>&1 &
 
 EOF
 
@@ -291,11 +291,11 @@ chmod +x /home/pi/distance/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/cron.sh > /home/pi/iot.log 2>&1 \n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "distance/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/distance/cron.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/distance/cron.sh > /home/pi/iot.log 2>&1 \n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

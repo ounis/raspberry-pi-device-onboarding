@@ -29,6 +29,7 @@ export OLT_RGB_DEVICE_TYPE=`cat /home/pi/out/rgb_type.txt`
 bash /home/pi/install_hue.sh
 export OLT_HUE_DEVICE=`cat /home/pi/out/hue.txt`
 export OLT_HUE_DEVICE_TYPE=`cat /home/pi/out/hue_type.txt`
+export OLT_HUE_LIGHTBULB_DEVICE_TYPE=`cat /home/pi/out/hue_type.txt`
 
 bash /home/pi/install_link.sh
 

@@ -188,7 +188,7 @@ cat << 'EOF' > /home/pi/camera/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[c]amera.py' | awk '{print $2}')
-/usr/bin/python3 /home/pi/camera/camera.py &
+/usr/bin/python3 /home/pi/camera/camera.py > /home/pi/iot.log 2>&1 &
 
 EOF
 
@@ -196,11 +196,11 @@ chmod +x /home/pi/camera/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/cron.sh > /home/pi/iot.log 2>&1 \n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "camera/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/camera/cron.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/camera/cron.sh > /home/pi/iot.log 2>&1 \n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 

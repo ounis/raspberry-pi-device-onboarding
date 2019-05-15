@@ -115,6 +115,28 @@ CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
 diff <(echo "$CODE" ) <(echo "204")
 
 [[ $- == *i* ]] && tput setaf 2
+echo "Delete Hue lightbulbs"
+[[ $- == *i* ]] && tput sgr0
+
+for filename in /home/pi/out/hue_lightbulb_device_*.txt; do
+    echo "Delete Hue lightbulb $filename"
+    export OLT_HUE_LIGHTBULB_DEVICE=`cat $filename`
+    CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+      "https://api.$OLT_PLATFORM/v1/devices/$OLT_HUE_LIGHTBULB_DEVICE" \
+      -H "Authorization: Bearer $OLT_TOKEN")"
+    diff <(echo "$CODE" ) <(echo "204")
+done
+
+[[ $- == *i* ]] && tput setaf 2
+echo "Delete Hue lightbulb Type"
+[[ $- == *i* ]] && tput sgr0
+
+CODE="$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+  "https://api.$OLT_PLATFORM/v1/device-types/$OLT_HUE_LIGHTBULB_DEVICE_TYPE" \
+  -H "Authorization: Bearer $OLT_TOKEN")"
+diff <(echo "$CODE" ) <(echo "204")
+
+[[ $- == *i* ]] && tput setaf 2
 echo "Delete Raspberry"
 [[ $- == *i* ]] && tput sgr0
 

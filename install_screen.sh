@@ -380,7 +380,7 @@ cat << 'EOF' > /home/pi/screen/cron.sh
 #!/bin/bash
 
 kill $(ps aux | grep '[s]creen.py' | awk '{print $2}')
-/usr/bin/python3 /home/pi/screen/screen.py &
+/usr/bin/python3 /home/pi/screen/screen.py > /home/pi/iot.log 2>&1 &
 
 EOF
 
@@ -388,11 +388,11 @@ chmod +x /home/pi/screen/cron.sh
 
 crontab -l > /tmp/crontabentry 2>&1 || true
 if grep -q "no crontab" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/screen/cron.sh\n" > /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/screen/cron.sh > /home/pi/iot.log 2>&1 \n" > /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 if ! grep -q "screen/cron.sh" /tmp/crontabentry; then
-  echo -e "\n* * * * * /home/pi/screen/cron.sh\n" >> /tmp/crontabentry
+  echo -e "\n* * * * * /home/pi/screen/cron.sh > /home/pi/iot.log 2>&1 \n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
 
