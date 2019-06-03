@@ -130,6 +130,12 @@ OLT_HUE_DEVICE=`curl -X POST \
 }" | \
 python3 -c "import sys, json; print(json.load(sys.stdin)['data']['id'])"`
 
+crontab -l
+
+mkdir -p /home/pi/out
+echo $OLT_HUE_DEVICE_TYPE > /home/pi/out/hue_type.txt
+echo $OLT_HUE_DEVICE > /home/pi/out/hue.txt
+
 if [ -d /home/pi/hue ]; then
   rm -rf /home/pi/hue;
 fi
@@ -449,12 +455,6 @@ if ! grep -q "hue/cron.sh" /tmp/crontabentry; then
   echo -e "\n* * * * * /home/pi/hue/cron.sh > /home/pi/iot.log 2>&1 \n" >> /tmp/crontabentry
   crontab /tmp/crontabentry
 fi
-
-crontab -l
-
-mkdir -p /home/pi/out
-echo $OLT_HUE_DEVICE_TYPE > /home/pi/out/hue_type.txt
-echo $OLT_HUE_DEVICE > /home/pi/out/hue.txt
 
 [[ $- == *i* ]] && tput setaf 2
 echo "Installation complete"
