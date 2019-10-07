@@ -182,7 +182,7 @@ OLT_HUE_LIGHTBULB_DEVICE=`curl -X POST \
     \"tags\": [
       \"Philips\",
       \"HUE\",
-      \"Lightbulb\"
+      \"Lightbulb\",
       \"${array[$i]}\"
     ],
     \"connectedBy\": \"$OLT_HUE_DEVICE\",
